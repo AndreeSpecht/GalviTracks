@@ -71,5 +71,8 @@ def avaliar_frota(snapshot, clientes, base, cfg, agora=None):
     """Acrescenta a chave 'alertas' em cada motoboy do snapshot e o devolve."""
     pontos_fixos = [base, *({"lat": c["lat"], "lon": c["lon"]} for c in clientes)]
     for dados in snapshot.values():
+        recebido = dados.get("recebido_em") or 0
+        dados["online"] = bool(recebido and 0 <= (int(time.time() if agora is None else agora) - recebido)
+                               < cfg.ALERTA_SEM_SINAL_MIN * 60)
         dados["alertas"] = alertas_do_motoboy(dados, pontos_fixos + list(dados.get("rota", [])), cfg, agora)
     return snapshot

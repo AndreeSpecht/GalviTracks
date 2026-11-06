@@ -67,6 +67,9 @@ class Config:
     OWNTRACKS_TOKEN = _env("OWNTRACKS_TOKEN", "")  # vazio = endpoint aberto
     GPS_PRECISAO_MAX_M = _env_float("GPS_PRECISAO_MAX_M", "100")
     GPS_VELOCIDADE_MAX_KMH = _env_float("GPS_VELOCIDADE_MAX_KMH", "150")
+    GPS_VELOCIDADE_ALPHA = _env_float("GPS_VELOCIDADE_ALPHA", "0.35")
+    SESSAO_INTERVALO_S = _env_float("SESSAO_INTERVALO_S", "5")
+    TRACKLOG_DIAS = int(_env("TRACKLOG_DIAS", "90"))
 
     # Alertas de status (painel)
     ALERTA_SEM_SINAL_MIN = _env_float("ALERTA_SEM_SINAL_MIN", "3")  # minutos sem mensagem durante a entrega
@@ -83,3 +86,5 @@ class Config:
     # Servidor
     HOST = _env("HOST", "0.0.0.0")
     PORT = int(_env("PORT", "5000"))
+    THREADS = int(_env("THREADS", "24"))
+    STREAM_MAX = int(_env("STREAM_MAX", "10"))
