@@ -4,6 +4,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/). 
 
 ## [Não lançado]
 
+### Segurança do acesso pela internet
+- Quem chega pelo túnel (cabeçalhos de proxy, domínio `NGROK_DOMAIN` ou IP público) só alcança `/api/gps/owntracks` e `/api/health`; painel, API e arquivos estáticos respondem 403. A rede local não muda.
+- Pela internet o token do OwnTracks é obrigatório: sem `OWNTRACKS_TOKEN`, o servidor recusa as posições externas e o `GalviTracks.exe`/`tunel_ngrok.bat` não abrem o túnel.
+- O waitress deixa de apagar o `X-Forwarded-For` (`clear_untrusted_proxy_headers=False`), que é como o servidor reconhece o acesso externo.
+- Verificado com um túnel ngrok real; 22 testes novos, um deles com o waitress de verdade.
+
 ### Backend em tempo real, desempenho e robustez
 - SSE em `/api/stream`: snapshot imediato, agrupamento de 250 ms, ping de 15 s, limite configurável/503 e polling preservado. Waitress com 24 threads configuráveis e envio de blocos pequenos.
 - Estado com curso, precisão, horário de aceitação, online e versão por motoboy; velocidade suavizada por EMA, mantendo dados brutos no tracklog.

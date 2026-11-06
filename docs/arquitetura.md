@@ -128,6 +128,6 @@ Todo prazo de alerta usa hora do servidor. Timestamp GPS inválido ou mais de ci
 
 - O servidor OSRM público tem limite de uso justo. Em produção com muitas lojas, recomenda-se hospedar um OSRM próprio com o recorte de SC.
 - O estado da frota fica em um único processo (sem suporte a múltiplas instâncias do servidor).
-- O painel ainda não tem autenticação de operador (planejada para a semana 12). Não exponha o painel publicamente sem um túnel com controle de acesso.
+- O painel ainda não tem autenticação de operador (planejada para a semana 13). Enquanto isso, quem chega pelo túnel só alcança o endpoint do OwnTracks, que exige token; o painel fica restrito à rede da loja.
 - Sem GPS, a atualização SSE dos campos derivados do relógio (`online`/`alertas`) ocorre em até 15 s; a avaliação também incrementa a versão do motoboy quando esses campos mudam.
 - Estado JSON e histórico SQL não formam transação única entre arquivos. Falha SQL ao finalizar preserva a rota, mas recuperação de interrupção abrupta entre o commit do histórico e a gravação da sessão ainda requer reconciliação.

@@ -44,7 +44,7 @@ Pré-requisito: **Python 3.10+** ([download](https://www.python.org/downloads/);
 Abra a pasta do projeto e dê dois cliques em **`GalviTracks.exe`**. Ele faz tudo sozinho:
 
 1. na primeira vez, cria o ambiente Python e instala as dependências (alguns minutos, só uma vez);
-2. abre o túnel ngrok para os celulares, se `NGROK_DOMAIN` estiver no `.env` e o `ngrok.exe` em `tools/`;
+2. abre o túnel ngrok para os celulares, se `NGROK_DOMAIN` e `OWNTRACKS_TOKEN` estiverem no `.env` e o `ngrok.exe` em `tools/`. Pelo túnel só os celulares entram: o painel fica restrito à rede da loja;
 3. sobe o servidor e abre o painel no navegador.
 
 Para encerrar, feche a janela do GalviTracks: o servidor e o túnel fecham junto. Se o programa já estiver aberto, um novo clique só abre o painel.
@@ -146,7 +146,7 @@ Detalhes, diagramas de estado e sequência e as decisões de projeto estão em [
 | Geocodificação | **Nominatim** | Busca de endereços |
 | Visualização | **Leaflet.js** | Mapa interativo |
 | Relatórios | **openpyxl** | Exportação do histórico em Excel |
-| Qualidade | **pytest · GitHub Actions** | 83 testes em Windows e Ubuntu |
+| Qualidade | **pytest · GitHub Actions** | 105 testes em Windows e Ubuntu |
 
 ## Estrutura do repositório
 
@@ -191,7 +191,7 @@ pip install -r requirements-dev.txt
 pytest
 ```
 
-A suíte cobre as funções geográficas, o ciclo de entrega, o filtro de GPS, todos os endpoints, o OwnTracks (com e sem token) e a exportação Excel. A rede fica bloqueada durante os testes, o que também valida o modo offline. O CI roda a cada push em Windows e Ubuntu (Python 3.10, 3.12 e 3.13).
+A suíte cobre as funções geográficas, o ciclo de entrega, o filtro de GPS, todos os endpoints, o OwnTracks (com e sem token), o bloqueio do acesso pela internet e a exportação Excel. A rede fica bloqueada durante os testes, o que também valida o modo offline. O CI roda a cada push em Windows e Ubuntu (Python 3.10, 3.12 e 3.13).
 
 ## Metodologia e resultados esperados
 
