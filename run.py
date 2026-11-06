@@ -8,6 +8,15 @@ from radar_tracker import create_app
 from radar_tracker.config import Config
 
 
+def criar_servidor(app, port):
+    """Configuração compartilhada com a verificação real do stream."""
+    from waitress import create_server
+
+    cfg = app.extensions["radar"]["config"]
+    return create_server(app, host=cfg.HOST, port=port, threads=cfg.THREADS,
+                         send_bytes=1, channel_timeout=120, channel_request_lookahead=1)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Servidor do sistema de rastreamento de motoboys.")
     parser.add_argument("--debug", action="store_true", help="modo de desenvolvimento do Flask (recarga automática)")
@@ -21,12 +30,19 @@ def main():
         threading.Timer(1.5, lambda: webbrowser.open(url)).start()
     print(f"Painel disponível em {url}  (Ctrl+C para encerrar)")
 
-    if args.debug:
-        app.run(host=Config.HOST, port=args.port, debug=True, use_reloader=False)
-    else:
-        from waitress import serve
-
-        serve(app, host=Config.HOST, port=args.port, threads=8)
+    servidor = None
+    try:
+        if args.debug:
+            app.run(host=Config.HOST, port=args.port, debug=True, use_reloader=False, threaded=True)
+        else:
+            servidor = criar_servidor(app, args.port)
+            servidor.run()
+    finally:
+        app.extensions["radar"]["frota"].fechar()  # acorda os geradores antes de esperar as threads HTTP
+        if servidor is not None:
+            servidor.close()
+            servidor.task_dispatcher.shutdown()
+        app.extensions["radar"]["fechar"]()
 
 
 if __name__ == "__main__":

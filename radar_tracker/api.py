@@ -3,15 +3,17 @@
 import hmac
 import io
 import logging
+import math
 import time
 from datetime import datetime, timedelta
 
-from flask import Blueprint, abort, current_app, jsonify, render_template, request, send_file
+from flask import Blueprint, Response, abort, current_app, jsonify, render_template, request, send_file
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
 
-from . import alertas, roteamento
+from . import alertas, geo, roteamento
 from .frota import MotoboyNaoEncontrado
+from .stream import eventos
 
 log = logging.getLogger(__name__)
 bp = Blueprint("radar", __name__)
@@ -45,6 +47,9 @@ def _campo(dados, nome, tipo=str):
         valor = valor.strip()
         if not valor:
             abort(400, description=f"Campo '{nome}' não pode ser vazio.")
+    if tipo is float and (not math.isfinite(valor) or (nome == "lat" and not -90 <= valor <= 90)
+                          or (nome == "lon" and not -180 <= valor <= 180)):
+        abort(400, description=f"Campo '{nome}' fora da faixa válida.")
     return valor
 
 
@@ -72,19 +77,49 @@ def health():
 
 @bp.route("/api/motoboys")
 def motoboys():
-    return jsonify([{"id": m["id"], "nome": m["nome"], "cor": m["cor"]} for m in _frota().motoboys.values()])
+    return jsonify([{"id": m["id"], "nome": m["nome"], "cor": m["cor"], "tid": str(m["tid"])}
+                    for m in _frota().motoboys.values()])
 
 
 # --- Frota / rota ---
-def _estado_com_alertas():
-    cfg = _cfg()
+def _avaliar_estado(snapshot, banco, cfg):
     base = {"lat": cfg.BASE_LAT, "lon": cfg.BASE_LON}
-    return alertas.avaliar_frota(_frota().snapshot(), _banco().listar_clientes(), base, cfg)
+    return alertas.avaliar_frota(snapshot, banco.listar_clientes(), base, cfg)
+
+
+def _estado_com_alertas():
+    frota, banco, cfg = _frota(), _banco(), _cfg()
+    return frota.snapshot_com_versao(lambda dados: _avaliar_estado(dados, banco, cfg))[1]
 
 
 @bp.route("/api/estado")
 def estado():
     return jsonify(_estado_com_alertas())
+
+
+@bp.route("/api/stream")
+def stream():
+    frota, banco, cfg = _frota(), _banco(), _cfg()
+    liberar = current_app.extensions["radar"]["streams"].reservar()
+    if liberar is None:
+        return jsonify({"erro": "Limite de streams atingido; use /api/estado."}), 503, {"Retry-After": "3"}
+    resposta = Response(
+        eventos(frota, lambda dados: _avaliar_estado(dados, banco, cfg), liberar,
+                desconectado=request.environ.get("waitress.client_disconnected", lambda: False)),
+        content_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+    resposta.call_on_close(liberar)  # cobre inclusive gerador fechado antes do primeiro next()
+    return resposta
+
+
+@bp.route("/api/resumo")
+def resumo():
+    snapshot = _estado_com_alertas()
+    return jsonify({"em_rota": sum(m["status"] == "EM_ROTA" for m in snapshot.values()),
+                    "livres": sum(m["status"] == "LIVRE" for m in snapshot.values()),
+                    "com_alerta": sum(bool(m["alertas"]) for m in snapshot.values()),
+                    **_banco().resumo_dia()})
 
 
 @bp.route("/api/alertas")
@@ -128,9 +163,7 @@ def iniciar():
 
 @bp.route("/api/end", methods=["POST"])
 def finalizar():
-    viagem = _frota().finalizar(_campo(_json(), "id", int))
-    if viagem:
-        _banco().registrar_viagem(**viagem)
+    viagem = _frota().finalizar(_campo(_json(), "id", int), registrar=_banco().registrar_viagem)
     return jsonify({"ok": int(bool(viagem))})
 
 
@@ -139,6 +172,8 @@ def calcular():
     paradas = _json().get("stops", [])
     try:
         paradas = [{"lat": float(p["lat"]), "lon": float(p["lon"])} for p in paradas]
+        if any(not -90 <= p["lat"] <= 90 or not -180 <= p["lon"] <= 180 for p in paradas):
+            raise ValueError("Coordenadas inválidas")
     except (KeyError, TypeError, ValueError):
         abort(400, description="Lista de paradas inválida.")
     cfg = _cfg()
@@ -164,8 +199,9 @@ def _owntracks_autorizado():
 
 def _numero(valor):
     try:
-        return float(valor)
-    except (TypeError, ValueError):
+        numero = float(valor)
+        return numero if math.isfinite(numero) else None
+    except (TypeError, ValueError, OverflowError):
         return None
 
 
@@ -174,12 +210,12 @@ def gps_owntracks():
     if not _owntracks_autorizado():
         return jsonify({"erro": "Não autorizado."}), 401
     d = request.get_json(silent=True) or {}
-    if d.get("_type") != "location":
+    if not isinstance(d, dict) or d.get("_type") != "location":
         return jsonify([])  # OwnTracks espera uma lista (vazia) como resposta
     frota = _frota()
     mid = frota.id_por_tid(d.get("tid", ""))
     lat, lon = _numero(d.get("lat")), _numero(d.get("lon"))
-    if mid is None or lat is None or lon is None:
+    if mid is None or lat is None or lon is None or not -90 <= lat <= 90 or not -180 <= lon <= 180:
         log.info("OwnTracks: leitura ignorada (tid=%r).", d.get("tid"))
         return jsonify([])
     # bs (battery status) do OwnTracks: 2 = carregando, 3 = carga completa (na tomada)
@@ -189,29 +225,34 @@ def gps_owntracks():
         bateria=_numero(d.get("batt")),
         carregando=None if status_bateria is None else status_bateria in (2, 3),
     )
-    ts = int(d.get("tst") or time.time())
-    vel = frota.atualizar_posicao(mid, lat, lon, ts, precisao_m=_numero(d.get("acc")), vel_dispositivo=_numero(d.get("vel")))
-    if vel is None:
+    registro = frota.atualizar_posicao(mid, lat, lon, d.get("tst"), precisao_m=_numero(d.get("acc")),
+                                       vel_dispositivo=_numero(d.get("vel")), curso=_numero(d.get("cog")), detalhes=True)
+    if registro is None:
         log.info("OwnTracks: leitura descartada pelo filtro (moto %s, acc=%s).", mid, d.get("acc"))
     else:
-        _banco().registrar_posicao(mid, lat, lon, vel, ts)
+        _banco().registrar_posicao(**registro)
     return jsonify([])
 
 
 @bp.route("/api/tracklog")
 def tracklog():
-    mid = request.args.get("id", 0, type=int)
+    try:
+        mid = int(request.args.get("id", 0))
+    except ValueError:
+        abort(400, description="ID inválido.")
+    _frota().validar_id(mid)
     data = request.args.get("data")
     if data:
         try:
             inicio = datetime.strptime(data, "%Y-%m-%d")
-        except ValueError:
+            ts_inicio, ts_fim = int(inicio.timestamp()), int((inicio + timedelta(days=1)).timestamp())
+        except (ValueError, OSError, OverflowError):
             abort(400, description="Data inválida (use AAAA-MM-DD).")
-        ts_inicio, ts_fim = int(inicio.timestamp()), int((inicio + timedelta(days=1)).timestamp())
     else:
         ts_fim = int(time.time()) + 1
         ts_inicio = ts_fim - 86400
-    return jsonify(_banco().trilha(mid, ts_inicio, ts_fim))
+    pontos = _banco().trilha(mid, ts_inicio, ts_fim)
+    return jsonify(geo.simplificar_trilha(pontos) if request.args.get("simplificar") == "1" else pontos)
 
 
 # --- Clientes ---
@@ -224,6 +265,7 @@ def clientes():
 def salvar_cliente():
     d = _json()
     cid = _banco().salvar_cliente(_campo(d, "nome"), _campo(d, "lat", float), _campo(d, "lon", float))
+    _frota().notificar()
     return jsonify({"ok": 1, "id": cid})
 
 
@@ -231,6 +273,7 @@ def salvar_cliente():
 def atualizar_cliente():
     d = _json()
     _banco().atualizar_cliente(_campo(d, "id", int), _campo(d, "nome"), str(d.get("telefone", "")).strip())
+    _frota().notificar()
     return jsonify({"ok": 1})
 
 
@@ -241,12 +284,14 @@ def atualizar_cor():
     if not (cor.startswith("#") and len(cor) == 7):
         abort(400, description="Cor deve estar no formato #rrggbb.")
     _banco().atualizar_cor_cliente(_campo(d, "id", int), cor)
+    _frota().notificar()
     return jsonify({"ok": 1})
 
 
 @bp.route("/api/apagar_cliente", methods=["POST"])
 def apagar_cliente():
     _banco().apagar_cliente(_campo(_json(), "id", int))
+    _frota().notificar()
     return jsonify({"ok": 1})
 
 
@@ -275,7 +320,8 @@ def baixar_excel():
         celula.font = Font(bold=True, color="FFFFFF")
         celula.fill = PatternFill("solid", fgColor="2C3E50")
     for linha in linhas:
-        ws.append([linha.get(chave) or "" for chave, _ in colunas])
+        valores = [linha.get(chave) or "" for chave, _ in colunas]
+        ws.append(["'" + v if isinstance(v, str) and v.startswith(("=", "+", "-", "@")) else v for v in valores])
     for letra, largura in zip("ABCDEF", (12, 20, 16, 60, 10, 10)):
         ws.column_dimensions[letra].width = largura
     ws.freeze_panes = "A2"
