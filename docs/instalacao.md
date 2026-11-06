@@ -63,11 +63,12 @@ Os celulares dos motoboys usam dados móveis, então o servidor precisa de um en
 
 1. Crie uma conta gratuita em [ngrok.com](https://ngrok.com), instale o `ngrok` (ou coloque o `ngrok.exe` na pasta `tools/`) e execute `ngrok config add-authtoken <token>`.
 2. Reserve um domínio estático gratuito no painel do ngrok e coloque-o no `.env`: `NGROK_DOMAIN=seu-dominio.ngrok-free.app`.
-3. Pronto: o `GalviTracks.exe` abre o túnel automaticamente. Para abrir só o túnel, use `scripts\windows\tunel_ngrok.bat` (ou `ngrok http --domain=$NGROK_DOMAIN 5000`).
+3. Defina `OWNTRACKS_TOKEN` no `.env`. **Sem token o túnel não abre**, porque qualquer pessoa na internet poderia enviar posições falsas.
+4. Pronto: o `GalviTracks.exe` abre o túnel automaticamente. Para abrir só o túnel, use `scripts\windows\tunel_ngrok.bat` (ou `ngrok http --domain=$NGROK_DOMAIN 5000`).
 
 Alternativa: **Cloudflare Tunnel** (`cloudflared tunnel --url http://localhost:5000`).
 
-> ⚠️ O painel ainda não tem login de operador. Ao expor o servidor na internet, defina `OWNTRACKS_TOKEN` e compartilhe o endereço apenas com a equipe.
+**O que fica acessível pela internet.** Só o endpoint dos celulares (`/api/gps/owntracks`, que exige o token) e o `/api/health`. O painel e o restante da API respondem **403** a quem chega pelo túnel e continuam funcionando normalmente no computador da loja e na rede local. O servidor reconhece o acesso externo pelo cabeçalho `X-Forwarded-For` que o ngrok e o Cloudflare Tunnel acrescentam, pelo domínio `NGROK_DOMAIN` ou por um IP de origem público.
 
 ## 4. Configurar o OwnTracks no celular do motoboy
 
@@ -117,6 +118,8 @@ pytest
 | Tempo aparece como "estimativa offline" | O OSRM público não respondeu em 3 s. Verifique a internet ou configure `OSRM_URL`. |
 | Motoboy não se move | Confira URL, modo HTTP e Tracker ID no OwnTracks. O log do servidor mostra `tid desconhecido` ou `descartada pelo filtro`. |
 | Erro 401 no OwnTracks | Senha diferente de `OWNTRACKS_TOKEN`. |
+| Erro 403 no OwnTracks | `OWNTRACKS_TOKEN` vazio no servidor: pela internet o token é obrigatório. |
+| "Disponível somente na rede da loja" | O painel foi aberto pelo endereço do túnel. Use `http://127.0.0.1:5000` no computador da loja ou o IP dele na rede local. |
 | Porta 5000 ocupada | `python run.py --port 5050` (ajuste também o túnel). |
 | Alerta "sem sinal" com o motoboy rodando normalmente | O OwnTracks está em modo econômico. Use o modo **Move** e desative a otimização de bateria do Android para o app. |
 | Leituras descartadas com frequência | GPS com precisão ruim; aumente `GPS_PRECISAO_MAX_M` (ex.: 200). |

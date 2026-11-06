@@ -110,6 +110,8 @@ Cada motoboy em `/api/estado` traz a lista `alertas`, e `GET /api/alertas` devol
 
 Resposta sempre `[]` (o OwnTracks espera uma lista). Se `OWNTRACKS_TOKEN` estiver definido, envie-o como **senha** do HTTP Basic Auth (o usuário pode ser qualquer um) ou no header `X-Token`. Sem o token, a resposta é **401**.
 
+**Acesso pela internet.** Requisições que chegam por túnel ou proxy (cabeçalho `X-Forwarded-For`, `Forwarded`, `X-Real-IP` ou `CF-Connecting-IP`), com o `Host` igual a `NGROK_DOMAIN` ou de um IP público só podem usar `/api/gps/owntracks` e `/api/health`; as demais rotas, incluindo o painel e os arquivos estáticos, respondem **403**. Nesse caso o token é obrigatório: com `OWNTRACKS_TOKEN` vazio, o endpoint responde **403** a quem vem de fora. Requisições da própria máquina e da rede local (IPs privados) não mudam.
+
 JSON não objeto, coordenadas não finitas/fora de latitude [-90,90] e longitude [-180,180] são ignorados sem erro 500. Saltos impossíveis também são filtrados entre leituras do mesmo segundo. Contato/bateria continuam atualizados quando uma posição é descartada por precisão ou ordem temporal.
 
 | Método | Rota | Descrição |

@@ -64,7 +64,10 @@ class Config:
     MINUTOS_POR_PARADA = _env_float("MINUTOS_POR_PARADA", "5")
 
     # Rastreamento GPS
-    OWNTRACKS_TOKEN = _env("OWNTRACKS_TOKEN", "")  # vazio = endpoint aberto
+    # Vazio = endpoint aberto só na rede da loja; pela internet (túnel) o token é obrigatório
+    OWNTRACKS_TOKEN = _env("OWNTRACKS_TOKEN", "")
+    # Domínio do túnel ngrok: requisições com esse Host contam como vindas da internet
+    NGROK_DOMAIN = _env("NGROK_DOMAIN", "")
     GPS_PRECISAO_MAX_M = _env_float("GPS_PRECISAO_MAX_M", "100")
     GPS_VELOCIDADE_MAX_KMH = _env_float("GPS_VELOCIDADE_MAX_KMH", "150")
     GPS_VELOCIDADE_ALPHA = _env_float("GPS_VELOCIDADE_ALPHA", "0.35")

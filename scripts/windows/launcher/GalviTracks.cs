@@ -55,7 +55,8 @@ static class GalviTracks
             }
 
             string dominio = Valor(env, "NGROK_DOMAIN", "");
-            Process tunel = semTunel ? null : IniciarTunel(dominio, porta);
+            string token = Valor(env, "OWNTRACKS_TOKEN", "");
+            Process tunel = semTunel ? null : IniciarTunel(dominio, porta, token);
 
             Etapa("Iniciando o servidor");
             Process servidor = Iniciar(Path.Combine(raiz, @".venv\Scripts\python.exe"),
@@ -148,11 +149,18 @@ static class GalviTracks
     }
 
     // --- Túnel ngrok -------------------------------------------------------
-    static Process IniciarTunel(string dominio, string porta)
+    static Process IniciarTunel(string dominio, string porta, string token)
     {
         if (string.IsNullOrEmpty(dominio))
         {
             Aviso("Túnel para os celulares desligado (NGROK_DOMAIN vazio no .env). O painel funciona normalmente.");
+            return null;
+        }
+        if (string.IsNullOrEmpty(token))
+        {
+            // Sem token qualquer pessoa na internet poderia enviar posições falsas.
+            Aviso("Túnel NÃO aberto: defina OWNTRACKS_TOKEN no .env (a mesma senha configurada no app");
+            Aviso("OwnTracks dos motoboys). O painel funciona normalmente nesta rede.");
             return null;
         }
         string ngrok = Path.Combine(raiz, @"tools\ngrok.exe");
@@ -305,7 +313,11 @@ static class GalviTracks
         Console.WriteLine("   ===================================================");
         Console.ResetColor();
         Console.WriteLine("    Painel:    " + painel);
-        if (dominio != null) Console.WriteLine("    Celulares: https://" + dominio + "/api/gps/owntracks");
+        if (dominio != null)
+        {
+            Console.WriteLine("    Celulares: https://" + dominio + "/api/gps/owntracks");
+            Console.WriteLine("    Pela internet só os celulares entram; o painel fica nesta rede.");
+        }
         Console.WriteLine();
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("    Para encerrar, feche esta janela.");
