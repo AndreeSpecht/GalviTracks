@@ -26,7 +26,8 @@ using System.Threading;
 static class GalviTracks
 {
     static string raiz;
-    static IntPtr job = IntPtr.Zero;
+    // Um job por processo filho; os handles ficam abertos enquanto esta janela existir.
+    static readonly List<IntPtr> jobs = new List<IntPtr>();
 
     static int Main(string[] args)
     {
@@ -40,7 +41,6 @@ static class GalviTracks
         Cabecalho();
         try
         {
-            CriarJob();
             string python = PrepararAmbiente();
             Dictionary<string, string> env = LerEnv(Path.Combine(raiz, ".env"));
             string porta = Valor(env, "PORT", "5000");
@@ -188,7 +188,10 @@ static class GalviTracks
         };
         psi.EnvironmentVariables["PYTHONUTF8"] = "1";
         Process p = Process.Start(psi);
-        if (job != IntPtr.Zero) AssignProcessToJobObject(job, p.Handle);
+        IntPtr job = CriarJob();
+        if (job == IntPtr.Zero || !AssignProcessToJobObject(job, p.Handle))
+            Aviso("Não foi possível vincular " + Path.GetFileName(exe) + " à janela (erro " + Marshal.GetLastWin32Error() + ").");
+        else jobs.Add(job);
         return p;
     }
 
@@ -323,10 +326,12 @@ static class GalviTracks
     }
 
     // --- Job object: filhos morrem junto com esta janela -------------------
-    static void CriarJob()
+    // Um job novo por processo: um job cujo único membro já terminou deixa de aceitar
+    // novos processos (erro 87), o que acontecia na primeira execução após a instalação.
+    static IntPtr CriarJob()
     {
-        job = CreateJobObject(IntPtr.Zero, null);
-        if (job == IntPtr.Zero) return;
+        IntPtr job = CreateJobObject(IntPtr.Zero, null);
+        if (job == IntPtr.Zero) return job;
         var info = new JOBOBJECT_EXTENDED_LIMIT_INFORMATION();
         info.BasicLimitInformation.LimitFlags = 0x2000; // JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
         int tamanho = Marshal.SizeOf(typeof(JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
@@ -337,15 +342,16 @@ static class GalviTracks
             if (!SetInformationJobObject(job, 9, ptr, (uint)tamanho)) job = IntPtr.Zero; // 9 = ExtendedLimitInformation
         }
         finally { Marshal.FreeHGlobal(ptr); }
+        return job;
     }
 
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     static extern IntPtr CreateJobObject(IntPtr atributos, string nome);
 
     [DllImport("kernel32.dll")]
     static extern bool SetInformationJobObject(IntPtr job, int classe, IntPtr info, uint tamanho);
 
-    [DllImport("kernel32.dll")]
+    [DllImport("kernel32.dll", SetLastError = true)]
     static extern bool AssignProcessToJobObject(IntPtr job, IntPtr processo);
 
     [StructLayout(LayoutKind.Sequential)]
