@@ -73,11 +73,14 @@ def test_duracao_curta_em_texto():
     assert alertas._duracao(30) == "menos de 1 min"
 
 
-def test_frota_conta_tempo_parado_e_reinicia_ao_andar(tmp_path):
+def test_frota_conta_tempo_parado_e_reinicia_ao_andar(tmp_path, monkeypatch):
     f = Frota([dict(m) for m in MOTOBOYS], *BASE.values(), tmp_path / "s.json", raio_parado_m=50)
+    monkeypatch.setattr("radar_tracker.frota.time.time", lambda: 1000)
     f.atualizar_posicao(0, -26.50, -49.10, ts=1000)
+    monkeypatch.setattr("radar_tracker.frota.time.time", lambda: 1300)
     f.atualizar_posicao(0, -26.50001, -49.10, ts=1300)  # ~1 m: continua parado
     assert f.estado[0]["parado_desde"] == 1000
+    monkeypatch.setattr("radar_tracker.frota.time.time", lambda: 1330)
     f.atualizar_posicao(0, -26.501, -49.10, ts=1330)  # ~110 m: andou
     assert f.estado[0]["parado_desde"] == 1330
 
