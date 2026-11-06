@@ -2,109 +2,84 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Cpath d='M16 6 23 25 16 21 9 25Z' fill='white'/%3E%3C/svg%3E" />
   <title>{{ empresa }} · Rastreamento de Motoboys</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+  <script>
+    /* Aplica o tema antes de pintar a página, para não piscar */
+    (function () {
+      var tema = null;
+      try { tema = localStorage.getItem('radar.tema'); } catch (e) {}
+      if (tema !== 'claro' && tema !== 'escuro') {
+        tema = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro';
+      }
+      document.documentElement.dataset.tema = tema;
+    })();
+  </script>
 </head>
 <body>
-<div id="map"></div>
-
-<div id="painel">
-  <div id="mobile-toggle"><i class="fas fa-chevron-down"></i></div>
-  <div class="tabs" id="tabs-container"></div>
-  <div id="alertas-box" class="hidden"></div>
-  <div id="status-box" class="livre">DISPONÍVEL</div>
-
-  <div class="conteudo-principal">
-    <div id="controles-edicao">
-      <div class="linha">
-        <input type="text" id="inp-busca" placeholder="Buscar cliente ou endereço..." />
-        <button id="btn-buscar" title="Buscar"><i class="fas fa-search"></i></button>
-      </div>
-      <div class="linha">
-        <input list="lista-clientes-sugestao" id="inp-cliente-salvo" placeholder="Cliente salvo..." />
-        <datalist id="lista-clientes-sugestao"></datalist>
-        <button id="btn-add-cliente" class="btn-verde" title="Adicionar à rota"><i class="fas fa-plus"></i></button>
+<div id="app">
+  <header class="topo">
+    <button class="btn-icone so-desktop" id="btn-painel" type="button" aria-label="Mostrar ou ocultar o painel" title="Painel"></button>
+    <div class="marca">
+      <span class="marca-logo" aria-hidden="true"></span>
+      <div class="marca-texto">
+        <strong>{{ empresa }}</strong>
+        <span>Rastreamento de entregas</span>
       </div>
     </div>
-    <button id="btn-otimizar" class="btn-opt hidden">⚡ Otimizar rota (vizinho mais próximo)</button>
-    <ul id="lista"></ul>
-    <div id="msg-vazio">Nenhuma parada na rota</div>
-  </div>
 
-  <div class="footer-btns">
-    <div class="tempo">
-      <b>Tempo estimado: <span id="tempo">0 min</span></b>
-      <small id="tempo-fonte"></small>
-    </div>
-    <input type="text" id="inp-nota" placeholder="Nº NOTA / PEDIDO" />
-    <button id="btn-iniciar" class="btn-full btn-go">🚀 SAIR PARA ENTREGA</button>
-    <button id="btn-voltar" class="btn-full btn-end hidden">🏁 FINALIZAR ROTA</button>
+    <ul class="resumo" id="resumo" aria-label="Resumo do dia"></ul>
 
-    <div class="action-grid">
-      <button class="modern-btn btn-report" id="btn-relatorio"><i class="fas fa-file-alt"></i> Relatório</button>
-      <button class="modern-btn btn-replay" id="btn-replay"><i class="fas fa-history"></i> Replay</button>
-      <button class="modern-btn btn-manage" id="btn-clientes"><i class="fas fa-users"></i> Gerenciar clientes</button>
+    <div class="topo-acoes">
+      <span class="conexao" id="conexao" role="status" aria-live="polite"></span>
+      <button class="btn-topo" id="btn-historico" type="button"></button>
+      <button class="btn-topo" id="btn-clientes" type="button"></button>
+      <div class="notif">
+        <button class="btn-icone" id="btn-alertas" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Alertas"></button>
+        <div class="notif-painel" id="notif-painel" role="region" aria-label="Central de alertas" hidden></div>
+      </div>
+      <button class="btn-icone" id="btn-tema" type="button" aria-label="Alternar tema claro/escuro"></button>
     </div>
-  </div>
+  </header>
+
+  <main class="corpo">
+    <aside class="painel" id="painel" aria-label="Frota e rotas">
+      <div class="painel-alca" id="painel-alca" aria-hidden="true"><span></span></div>
+      <div class="painel-rolagem">
+        <section class="secao">
+          <div class="secao-cab">
+            <h2>Frota</h2>
+            <span class="secao-dica">teclas 1–9</span>
+          </div>
+          <ul class="frota" id="frota" role="listbox" aria-label="Motoboys"></ul>
+        </section>
+        <section class="secao detalhe" id="detalhe" aria-live="polite"></section>
+      </div>
+      <footer class="painel-rodape" id="rodape"></footer>
+    </aside>
+
+    <div class="mapa-area">
+      <div id="mapa" role="application" aria-label="Mapa da frota"></div>
+      <div class="mapa-ctrl" id="mapa-ctrl"></div>
+      <div class="mira-aviso" id="mira-aviso" hidden></div>
+      <div class="replay" id="replay" hidden></div>
+    </div>
+  </main>
 </div>
 
-<div class="modal-overlay" id="modal-gestao-clientes">
-  <div class="modal-box">
-    <div class="modal-header">Gerenciar clientes <span class="fechar" data-fechar="modal-gestao-clientes">✕</span></div>
-    <div class="modal-body">
-      <input type="text" id="filtro-cli-lista" placeholder="Filtrar por nome..." />
-      <div class="tabela-rolagem">
-        <table class="cli-table" id="tabela-clientes">
-          <thead><tr><th>Nome</th><th>Telefone</th><th>Ações</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-relatorio">
-  <div class="modal-box">
-    <div class="modal-header">Histórico de viagens <span class="fechar" data-fechar="modal-relatorio">✕</span></div>
-    <div class="modal-body">
-      <div class="filtros">
-        <input type="date" id="filtro-inicio" title="Data inicial" />
-        <input type="date" id="filtro-fim" title="Data final" />
-        <button id="btn-filtrar">Filtrar</button>
-        <button id="btn-excel" class="btn-verde"><i class="fas fa-file-excel"></i> Excel</button>
-      </div>
-      <div class="tabela-rolagem">
-        <table class="cli-table">
-          <thead><tr><th>Data</th><th>Motoboy</th><th>Nota</th><th>Destinos</th><th>Saída</th><th>Chegada</th></tr></thead>
-          <tbody id="tbody-historico"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-replay">
-  <div class="modal-box modal-pequeno">
-    <div class="modal-header roxo">🎥 Replay de trilha <span class="fechar" data-fechar="modal-replay">✕</span></div>
-    <div class="modal-body">
-      <div class="replay-box">
-        <p>Reproduza o percurso do motoboy selecionado.</p>
-        <input type="date" id="replay-data" title="Dia (vazio = últimas 24h)" />
-        <input type="range" id="replay-slider" min="0" max="100" value="0" />
-        <h2 id="replay-time">--:--</h2>
-        <button id="btn-carregar-trilha" class="btn-roxo">Carregar trilha</button>
-      </div>
-    </div>
-  </div>
-</div>
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
   window.RADAR = { empresa: {{ empresa|tojson }}, base: [{{ base_lat }}, {{ base_lon }}] };
 </script>
-<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
