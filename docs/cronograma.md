@@ -5,6 +5,8 @@
 Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08/2026 a 04/12/2026. Uma entrega está concluída quando está no branch `main`, com testes passando no CI e documentação atualizada. As semanas 9 a 18 estão cadastradas como **milestones** no GitHub, com as tarefas em **issues**.
 
 > As entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026.
+>
+> As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026. A confirmação de entrega por parada saiu do escopo (trabalho futuro) e o login de operador passou para a semana 13.
 
 ## Marcos
 
@@ -29,10 +31,10 @@ Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08
 | 7 | 18/09/2026 | Roteirização | Cálculo de rota via OSRM, modo offline e otimização por vizinho mais próximo. | radar_tracker/roteamento.py, geo.py | ✅ Concluída |
 | 8 | 25/09/2026 | Qualidade | Refatoração modular, testes automatizados, CI, documentação e cronograma. | Release v0.8.0 | ✅ Concluída |
 | 9 | 02/10/2026 | Rastreamento GPS | Alertas de status do motoboy: sinal perdido, parado por muito tempo e bateria baixa. | alertas.py + issues #31–#33 fechadas | ✅ Concluída |
-| 10 | 09/10/2026 | Entregas | Confirmação de entrega por parada, com horário de chegada em cada cliente. | Milestone "Semana 10" | 🔜 Planejada |
-| 11 | 16/10/2026 | Relatórios | Indicadores de desempenho e melhorias no replay de trilha. | Milestone "Semana 11" | 🔜 Planejada |
-| 12 | 23/10/2026 | Segurança | Login de operador no painel e perfis de acesso. | Milestone "Semana 12" | 🔜 Planejada |
-| 13 | 30/10/2026 | Testes | Testes de campo e homologação do rastreador na Radar Auto Peças. | Release v0.9.0 | 🔜 Planejada |
+| 10 | 09/10/2026 | Tempo real | Backend em tempo real: estado da frota por SSE, resumo do dia e robustez do GPS. | radar_tracker/api.py, frota.py, docs/api.md | ✅ Concluída |
+| 11 | 16/10/2026 | Painel | Novo painel: mapa fluido, indicadores do dia e replay aprimorado. | radar_tracker/static/js/, static/css/app.css | ✅ Concluída |
+| 12 | 23/10/2026 | Implantação | GalviTracks.exe: instalação, túnel, servidor e painel com um clique. | GalviTracks.exe, scripts/windows/launcher/ | ✅ Concluída |
+| 13 | 30/10/2026 | Segurança e testes | Segurança do acesso externo, login de operador e homologação na Radar Auto Peças. | Release v0.9.0 | 🔜 Planejada |
 | 14 | 06/11/2026 | Avaliação | Cronometragem de base (processo atual) e treinamento da equipe. | Planilha de medições (baseline) | 🔜 Planejada |
 | 15 | 13/11/2026 | Avaliação | Piloto em ambiente real com cronometragem usando o sistema. | Planilha de medições (piloto) | 🔜 Planejada |
 | 16 | 20/11/2026 | Avaliação | Aplicação do questionário SUS e ajustes finais de usabilidade. | Resultado SUS | 🔜 Planejada |
@@ -131,43 +133,43 @@ Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08
 
 **Evidência:** alertas.py + issues #31–#33 fechadas · **Status:** Concluída
 
-### Semana 10 · 09/10/2026 · Entregas
+### Semana 10 · 09/10/2026 · Tempo real
 
-**Entrega:** Confirmação de entrega por parada, com horário de chegada em cada cliente.
+**Entrega:** Backend em tempo real: estado da frota por SSE, resumo do dia e robustez do GPS.
 
-- Marcar cada parada como entregue no painel
-- Registrar o horário de chegada por cliente
-- Histórico detalhado por parada
+- Stream /api/stream (Server-Sent Events) com volta automática ao polling de 2 s
+- Gravação da sessão agrupada, SQLite em WAL e retenção da trilha
+- Saneamento de horários e coordenadas, curso e precisão por motoboy e 40 testes novos (83 no total)
 
-**Evidência:** Milestone "Semana 10" · **Status:** Planejada
+**Evidência:** radar_tracker/api.py, frota.py, docs/api.md · **Status:** Concluída
 
-### Semana 11 · 16/10/2026 · Relatórios
+### Semana 11 · 16/10/2026 · Painel
 
-**Entrega:** Indicadores de desempenho e melhorias no replay de trilha.
+**Entrega:** Novo painel: mapa fluido, indicadores do dia e replay aprimorado.
 
-- Entregas por motoboy, tempo médio de rota e km rodados
-- Replay com velocidade e paradas
-- Exportação Excel com indicadores
+- Painel em módulos ES com design system e tema claro/escuro
+- Marcadores que deslizam e giram pela direção, resumo do dia (/api/resumo) e central de alertas
+- Replay com play/pausa, velocidades 1×/4×/16× e trilha colorida pela velocidade
 
-**Evidência:** Milestone "Semana 11" · **Status:** Planejada
+**Evidência:** radar_tracker/static/js/, static/css/app.css · **Status:** Concluída
 
-### Semana 12 · 23/10/2026 · Segurança
+### Semana 12 · 23/10/2026 · Implantação
 
-**Entrega:** Login de operador no painel e perfis de acesso.
+**Entrega:** GalviTracks.exe: instalação, túnel, servidor e painel com um clique.
 
-- Autenticação de usuários do painel
-- Perfis de acesso (operador / gestor)
-- Proteção das rotas da API e acesso externo via HTTPS
+- Instalação automática do ambiente Python na primeira execução
+- Túnel ngrok, servidor e navegador abertos juntos
+- Fechar a janela encerra todos os processos
 
-**Evidência:** Milestone "Semana 12" · **Status:** Planejada
+**Evidência:** GalviTracks.exe, scripts/windows/launcher/ · **Status:** Concluída
 
-### Semana 13 · 30/10/2026 · Testes
+### Semana 13 · 30/10/2026 · Segurança e testes
 
-**Entrega:** Testes de campo e homologação do rastreador na Radar Auto Peças.
+**Entrega:** Segurança do acesso externo, login de operador e homologação na Radar Auto Peças.
 
-- Testes de campo com os motoboys
-- Homologação com o operador de expedição
-- Correções e versão v0.9.0
+- Túnel restrito ao endpoint do OwnTracks, com token obrigatório
+- Login de operador no painel
+- Testes de campo, homologação com o operador de expedição e versão v0.9.0
 
 **Evidência:** Release v0.9.0 · **Status:** Planejada
 
@@ -228,6 +230,7 @@ Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08
 | Instabilidade do OSRM público | Média | Fallback offline já implementado; opção de hospedar OSRM próprio (OSRM_URL). |
 | Qualidade do GPS nos celulares | Alta | Filtro de precisão/saltos; uso da velocidade do aparelho; orientação sobre economia de bateria. |
 | Queda de internet ou do computador da loja | Média | Sessão gravada em disco e retomada no reinício; modo offline de rotas; backup da pasta data/. |
+| Exposição do painel pelo túnel | Média | Túnel restrito ao endpoint do OwnTracks, token obrigatório e login de operador (semana 13). |
 | Baixa adesão dos motoboys ao app | Média | Treinamento na semana 14; OwnTracks com configuração única e uso passivo. |
 | Amostra pequena para o SUS | Alta | Incluir operadores, gestor e motoboys; registrar como limitação no TCC. |
-| Atraso em alguma entrega semanal | Média | Folga nas semanas 11 e 17; escopo de relatórios pode ser reduzido sem afetar a avaliação. |
+| Atraso em alguma entrega semanal | Média | Semanas 10 a 12 replanejadas; a confirmação de entrega por parada saiu do escopo (trabalho futuro). Folga na semana 17. |

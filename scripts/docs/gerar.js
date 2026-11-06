@@ -129,7 +129,7 @@ const corpo = [
   bullet('a entrega foi demonstrada à professora, quando aplicável.'),
   p([t('Repositório: ', { bold: true }), new ExternalHyperlink({ link: REPO, children: [t(REPO, { style: 'Hyperlink' })] })], { align: AlignmentType.LEFT }),
   p('As semanas 9 a 18 estão cadastradas como milestones no GitHub, com data de vencimento na sexta-feira correspondente, e as tarefas de cada semana aparecem como issues. Assim, o progresso pode ser acompanhado diretamente no repositório.'),
-  p([t('Observação: ', { bold: true }), t('as entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026. As datas desta tabela e a coluna Status podem ser editadas neste documento conforme o calendário acadêmico.', { italics: true })]),
+  p([t('Observação: ', { bold: true }), t('as entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026. As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026; a confirmação de entrega por parada saiu do escopo e o login de operador passou para a semana 13. As datas desta tabela e a coluna Status podem ser editadas neste documento conforme o calendário acadêmico.', { italics: true })]),
 
   h1('3. Marcos do projeto'),
   tabela([900, 1500, 5126, 1500], ['Marco', 'Data', 'Descrição', 'Status'], marcos, { centro: [0, 1, 3], fundoLinha: fundoStatus }),
@@ -171,11 +171,14 @@ const situacao = [
   bullet([t('Correções do protótipo: ', { bold: true }), t('rota duplicada, perda de nome/cor ao finalizar, XSS com nomes de clientes, busca sem codificação, filtro de datas inoperante e motoboys fixos no código.')]),
   bullet([t('Tratamento de GPS: ', { bold: true }), t('descarte por precisão, ordem temporal e saltos acima de 150 km/h.')]),
   bullet([t('Alertas de status (semana 9): ', { bold: true }), t('o painel avisa quando o motoboy fica sem sinal, parado mais de 10 min fora de um cliente ou com a bateria do celular abaixo de 20%.')]),
-  bullet([t('Qualidade: ', { bold: true }), t('43 testes automatizados e integração contínua em Windows e Ubuntu.')]),
-  bullet([t('Portabilidade: ', { bold: true }), t('instalar.bat/iniciar.bat (Windows) e instalar.sh/iniciar.sh (Linux/macOS), simulador de motoboy e dados de demonstração.')]),
+  bullet([t('Tempo real (semana 10): ', { bold: true }), t('estado da frota por Server-Sent Events (/api/stream), com volta automática ao polling; resumo do dia em /api/resumo; SQLite em WAL e gravação agrupada da sessão.')]),
+  bullet([t('Novo painel (semana 11): ', { bold: true }), t('design system com tema claro/escuro, marcadores que deslizam e giram pela direção, central de alertas, histórico com filtros e replay com velocidades.')]),
+  bullet([t('Implantação (semana 12): ', { bold: true }), t('GalviTracks.exe instala o ambiente na primeira vez e abre túnel, servidor e painel com um clique; fechar a janela encerra tudo.')]),
+  bullet([t('Qualidade: ', { bold: true }), t('83 testes automatizados e integração contínua em Windows e Ubuntu (Python 3.10, 3.12 e 3.13).')]),
+  bullet([t('Portabilidade: ', { bold: true }), t('GalviTracks.exe (Windows) e instalar.sh/iniciar.sh (Linux/macOS), simulador de motoboy e dados de demonstração.')]),
   bullet([t('Documentação: ', { bold: true }), t('README, requisitos, arquitetura, API, banco de dados, instalação e histórico de desenvolvimento em docs/.')]),
   h2('Como executar'),
-  p([t('Windows: ', { bold: true }), t('clonar o repositório, executar instalar.bat e depois iniciar.bat. O painel abre em http://127.0.0.1:5000.')], { align: AlignmentType.LEFT }),
+  p([t('Windows: ', { bold: true }), t('clonar o repositório e dar dois cliques em GalviTracks.exe. O painel abre em http://127.0.0.1:5000.')], { align: AlignmentType.LEFT }),
   p([t('Linux/macOS: ', { bold: true }), t('./instalar.sh e ./iniciar.sh.')], { align: AlignmentType.LEFT }),
   p([t('Demonstração sem celular: ', { bold: true }), t('montar uma rota no painel e executar python scripts/simular_motoboy.py --tid 0.')], { align: AlignmentType.LEFT }),
 
@@ -252,7 +255,7 @@ if (process.argv[3]) {
   md.push('# Cronograma de entregas', '');
   md.push('> Versão editável em Word: [`Cronograma_Entregas_TCC.docx`](Cronograma_Entregas_TCC.docx)', '');
   md.push('Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08/2026 a 04/12/2026. Uma entrega está concluída quando está no branch `main`, com testes passando no CI e documentação atualizada. As semanas 9 a 18 estão cadastradas como **milestones** no GitHub, com as tarefas em **issues**.', '');
-  md.push('> As entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026.', '');
+  md.push('> As entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026.', '>', '> As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026. A confirmação de entrega por parada saiu do escopo (trabalho futuro) e o login de operador passou para a semana 13.', '');
   md.push('## Marcos', '', '| Marco | Data | Descrição | Status |', '|-------|------|-----------|--------|');
   marcos.forEach((m) => md.push(`| ${m[0]} | ${m[1]} | ${m[2]} | ${m[3] === 'Concluído' ? '✅ ' : '🔜 '}${m[3]} |`));
   md.push('', '## Entregas semanais', '', '| Sem. | Sexta-feira | Fase | Entrega | Evidência | Status |', '|:----:|:-----------:|------|---------|-----------|:------:|');

@@ -17,7 +17,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/). 
 - 40 testes novos (83 no total) e verificação real com Waitress, `curl -N`, 20 amostras de latência, frota simultânea, saturação de streams e heartbeat.
 - Frontend mantido intacto para integração com a reforma paralela do painel; nenhuma dependência nova.
 
-Planejado (ver [cronograma](docs/cronograma.md)): confirmação de entrega por parada, indicadores, login de operador, homologação e avaliação em ambiente real.
+Planejado (ver [cronograma](docs/cronograma.md)): segurança do túnel, login de operador, homologação e avaliação em ambiente real. A confirmação de entrega por parada saiu do escopo (trabalho futuro).
 
 ### Adicionado (semana 9, 02/10/2026)
 - Alertas de status no painel: **sem sinal** durante a entrega, **parado** fora de cliente e **bateria baixa** do celular.

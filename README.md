@@ -127,7 +127,7 @@ flowchart LR
     WEB["🖥️ Painel web (Leaflet.js)<br/>operador da loja"]
 
     APP -- "posição GPS (HTTP, ~2 s)" --> API
-    WEB <-->|"REST (poll 2 s)"| API
+    WEB <-->|"REST + SSE (/api/stream)"| API
     API --> FROTA
     API --> DB
     API <-->|"trajeto e tempo"| OSRM
@@ -146,7 +146,7 @@ Detalhes, diagramas de estado e sequência e as decisões de projeto estão em [
 | Geocodificação | **Nominatim** | Busca de endereços |
 | Visualização | **Leaflet.js** | Mapa interativo |
 | Relatórios | **openpyxl** | Exportação do histórico em Excel |
-| Qualidade | **pytest · GitHub Actions** | 43 testes em Windows e Ubuntu |
+| Qualidade | **pytest · GitHub Actions** | 83 testes em Windows e Ubuntu |
 
 ## Estrutura do repositório
 
@@ -207,7 +207,7 @@ Resultados esperados:
 
 ## Cronograma de entregas
 
-Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento completo e editável: **[docs/Cronograma_Entregas_TCC.docx](docs/Cronograma_Entregas_TCC.docx)** · versão web: [docs/cronograma.md](docs/cronograma.md). As semanas futuras estão nos [milestones do GitHub](https://github.com/AndreeSpecht/GalviTracks/milestones).
+Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento completo e editável: **[docs/Cronograma_Entregas_TCC.docx](docs/Cronograma_Entregas_TCC.docx)** · versão web: [docs/cronograma.md](docs/cronograma.md). As semanas 10 a 12 foram replanejadas e entregues em 06/11/2026; a confirmação de entrega por parada saiu do escopo. As semanas futuras estão nos [milestones do GitHub](https://github.com/AndreeSpecht/GalviTracks/milestones).
 
 | Sem. | Sexta | Entrega | Status |
 |:---:|:---:|---|:---:|
@@ -217,10 +217,10 @@ Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento 
 | 7 | 18/09 | Roteirização OSRM + vizinho mais próximo + offline | ✅ |
 | 8 | 25/09 | Refatoração, testes, CI e documentação · **v0.8.0** | ✅ |
 | 9 | 02/10 | Alertas: sinal perdido, parada prolongada e bateria baixa | ✅ |
-| 10 | 09/10 | Confirmação de entrega por parada (horário em cada cliente) | 🔜 |
-| 11 | 16/10 | Indicadores de desempenho e replay aprimorado | 🔜 |
-| 12 | 23/10 | Login de operador e perfis de acesso | 🔜 |
-| 13 | 30/10 | Testes de campo e homologação na loja · **v0.9.0** | 🔜 |
+| 10 | 09/10 | Backend em tempo real (SSE), resumo do dia e robustez do GPS | ✅ |
+| 11 | 16/10 | Novo painel: mapa fluido, indicadores do dia e replay aprimorado | ✅ |
+| 12 | 23/10 | GalviTracks.exe: instalação, túnel, servidor e painel com um clique | ✅ |
+| 13 | 30/10 | Segurança do túnel, login de operador e homologação na loja · **v0.9.0** | 🔜 |
 | 14–16 | 06/11 – 20/11 | Avaliação real: cronometragem e SUS | 🔜 |
 | 17 | 27/11 | Análise dos resultados e escrita do TCC | 🔜 |
 | 18 | 04/12 | Revisão final e defesa · **v1.0.0** | 🔜 |
