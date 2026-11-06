@@ -22,6 +22,7 @@ sessao_*.json
 # Binários de túnel (baixar do site oficial — ver docs/instalacao.md)
 tools/
 *.exe
+!/GalviTracks.exe
 
 # Arquivos locais do autor / legado
 _legado_local/

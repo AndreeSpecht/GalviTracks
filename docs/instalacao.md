@@ -10,14 +10,13 @@
 
 ### Windows
 
-```bat
-git clone https://github.com/AndreeSpecht/rastreamento-motoboys-galvitech.git
-cd rastreamento-motoboys-galvitech
-instalar.bat
-iniciar.bat
-```
+Dê dois cliques em **`GalviTracks.exe`**, na raiz do projeto. Na primeira execução ele cria o ambiente virtual (`.venv`), instala as dependências, copia `.env.example` → `.env` e `config/motoboys.example.json` → `config/motoboys.json` e cadastra os clientes de demonstração. Nas próximas, só reinstala as dependências quando o `requirements.txt` mudar.
 
-Também é possível dar dois cliques em `instalar.bat` e depois em `iniciar.bat` no Explorer.
+Em seguida abre o túnel ngrok (passo 3 abaixo), sobe o servidor e abre o painel. Fechar a janela encerra o servidor e o túnel.
+
+Opções de linha de comando: `GalviTracks.exe --sem-tunel` (não abre o ngrok) e `--sem-navegador`.
+
+O executável é compilado de [`scripts/windows/launcher/GalviTracks.cs`](../scripts/windows/launcher/GalviTracks.cs) por `scripts\windows\launcher\compilar.bat`, que usa o compilador C# já incluído no Windows.
 
 ### Linux / macOS
 
@@ -64,7 +63,7 @@ Os celulares dos motoboys usam dados móveis, então o servidor precisa de um en
 
 1. Crie uma conta gratuita em [ngrok.com](https://ngrok.com), instale o `ngrok` (ou coloque o `ngrok.exe` na pasta `tools/`) e execute `ngrok config add-authtoken <token>`.
 2. Reserve um domínio estático gratuito no painel do ngrok e coloque-o no `.env`: `NGROK_DOMAIN=seu-dominio.ngrok-free.app`.
-3. Com o servidor rodando, execute `scripts\windows\tunel_ngrok.bat` (ou `ngrok http --domain=$NGROK_DOMAIN 5000`).
+3. Pronto: o `GalviTracks.exe` abre o túnel automaticamente. Para abrir só o túnel, use `scripts\windows\tunel_ngrok.bat` (ou `ngrok http --domain=$NGROK_DOMAIN 5000`).
 
 Alternativa: **Cloudflare Tunnel** (`cloudflared tunnel --url http://localhost:5000`).
 

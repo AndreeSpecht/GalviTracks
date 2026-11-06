@@ -62,7 +62,7 @@ O simulador expôs um caso real durante os testes: duas leituras no mesmo segund
 
 ### Portabilidade
 
-- `instalar.bat`/`instalar.sh` e `iniciar.bat`/`iniciar.sh` criam o ambiente virtual e sobem o servidor.
+- Windows: `GalviTracks.exe` (fonte em `scripts/windows/launcher/`) cria o ambiente virtual, abre o túnel e sobe o servidor num clique; um *job object* garante que o servidor e o túnel fechem junto com a janela. Linux/macOS: `instalar.sh` e `iniciar.sh`.
 - Servidor **waitress** (compatível com Windows) em vez do servidor de desenvolvimento do Flask.
 - `pandas` removido: a exportação usa `openpyxl` diretamente, o que torna a instalação menor e mais rápida.
 

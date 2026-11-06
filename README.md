@@ -39,14 +39,17 @@ Sistema de rastreamento, roteirização e histórico de entregas por motoboy da 
 
 Pré-requisito: **Python 3.10+** ([download](https://www.python.org/downloads/); no Windows marque *Add python.exe to PATH*).
 
-**Windows**
+**Windows: um clique**
 
-```bat
-git clone https://github.com/AndreeSpecht/rastreamento-motoboys-galvitech.git
-cd rastreamento-motoboys-galvitech
-instalar.bat
-iniciar.bat
-```
+Abra a pasta do projeto e dê dois cliques em **`GalviTracks.exe`**. Ele faz tudo sozinho:
+
+1. na primeira vez, cria o ambiente Python e instala as dependências (alguns minutos, só uma vez);
+2. abre o túnel ngrok para os celulares, se `NGROK_DOMAIN` estiver no `.env` e o `ngrok.exe` em `tools/`;
+3. sobe o servidor e abre o painel no navegador.
+
+Para encerrar, feche a janela do GalviTracks: o servidor e o túnel fecham junto. Se o programa já estiver aberto, um novo clique só abre o painel.
+
+Para obter o projeto: `git clone https://github.com/AndreeSpecht/rastreamento-motoboys-galvitech.git GalviTracks`.
 
 **Linux / macOS**
 
@@ -163,11 +166,13 @@ rastreamento-motoboys-galvitech/
 ├── scripts/
 │   ├── seed_demo.py          # clientes fictícios
 │   ├── simular_motoboy.py    # simulador do OwnTracks
+│   ├── windows/launcher/     # código-fonte, ícone e compilação do GalviTracks.exe
 │   ├── windows/tunel_ngrok.bat
 │   └── docs/                 # gerador do cronograma (.docx/.md)
 ├── tests/                    # suíte pytest
 ├── docs/                     # documentação e cronograma
-├── instalar.bat · iniciar.bat · instalar.sh · iniciar.sh
+├── GalviTracks.exe          # Windows: um clique instala, abre o túnel, o servidor e o painel
+├── instalar.sh · iniciar.sh  # Linux/macOS
 ├── run.py                    # ponto de entrada
 ├── requirements.txt · requirements-dev.txt · .env.example
 └── .github/workflows/testes.yml
