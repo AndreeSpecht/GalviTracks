@@ -4,6 +4,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/). 
 
 ## [Não lançado]
 
+### Backend em tempo real, desempenho e robustez
+- SSE em `/api/stream`: snapshot imediato, agrupamento de 250 ms, ping de 15 s, limite configurável/503 e polling preservado. Waitress com 24 threads configuráveis e envio de blocos pequenos.
+- Estado com curso, precisão, horário de aceitação, online e versão por motoboy; velocidade suavizada por EMA, mantendo dados brutos no tracklog.
+- Sessão GPS com flush em segundo plano a cada 5 s, gravação imediata de rota/status, tentativas contra bloqueios do OneDrive e flush no encerramento.
+- SQLite WAL/NORMAL, conexões por thread, cache de clientes invalidado nas alterações e retenção diária da trilha (90 dias configuráveis).
+- Saneamento de timestamps futuros/não numéricos, alertas no relógio do servidor, validação de coordenadas e proteção contra saltos no mesmo segundo.
+- `/api/tracklog?simplificar=1` com Douglas-Peucker (~5 m), curso nos pontos e 404 para motoboy inexistente. Novo `/api/resumo` com frota, alertas, viagens e km GPS do dia.
+- Histórico com início/fim Unix, duração e data de saída correta ao passar da meia-noite; migração de registros antigos. Falha SQL ao finalizar preserva a rota.
+- Exportação Excel protege textos que começam como fórmulas.
+- Simulador com curso/precisão variáveis, `--todos`, `--max-posicoes` e suporte a Tracker IDs personalizados via campo adicional `tid` em `/api/motoboys`.
+- 40 testes novos (83 no total) e verificação real com Waitress, `curl -N`, 20 amostras de latência, frota simultânea, saturação de streams e heartbeat.
+- Frontend mantido intacto para integração com a reforma paralela do painel; nenhuma dependência nova.
+
 Planejado (ver [cronograma](docs/cronograma.md)): confirmação de entrega por parada, indicadores, login de operador, homologação e avaliação em ambiente real.
 
 ### Adicionado (semana 9, 02/10/2026)
