@@ -2,6 +2,7 @@
 
 import hmac
 import io
+import ipaddress
 import logging
 import math
 import time
@@ -61,6 +62,48 @@ def _motoboy_inexistente(_erro):
 @bp.app_errorhandler(400)
 def _requisicao_invalida(erro):
     return jsonify({"ok": 0, "erro": erro.description}), 400
+
+
+# --- Acesso pela internet (túnel ngrok/cloudflared) ---
+# Pelo túnel só os celulares precisam entrar: o painel e o resto da API ficam na rede da loja.
+ROTAS_EXTERNAS = frozenset({"/api/gps/owntracks", "/api/health"})
+_CABECALHOS_PROXY = ("X-Forwarded-For", "Forwarded", "X-Real-IP", "CF-Connecting-IP")
+
+
+def _requisicao_externa():
+    """Verdadeiro se a requisição veio da internet (por túnel/proxy ou de um IP público).
+
+    Os túneis repassam a conexão a partir do próprio computador (127.0.0.1), por isso o
+    endereço de origem não basta: eles sempre acrescentam X-Forwarded-For. Um cliente não
+    consegue retirar esse cabeçalho; acrescentá-lo só restringe o próprio acesso.
+    """
+    if any(nome in request.headers for nome in _CABECALHOS_PROXY):
+        return True
+    dominio = _cfg().NGROK_DOMAIN.strip().lower()
+    if dominio and request.host.split(":")[0].lower() == dominio:
+        return True
+    try:
+        ip = ipaddress.ip_address(request.remote_addr or "")
+    except ValueError:
+        return True
+    ip = getattr(ip, "ipv4_mapped", None) or ip
+    return not (ip.is_loopback or ip.is_private or ip.is_link_local)
+
+
+@bp.before_app_request
+def _proteger_acesso_externo():
+    if not _requisicao_externa():
+        return None
+    if request.path not in ROTAS_EXTERNAS:
+        log.warning("Acesso externo bloqueado: %s %s", request.method, request.path)
+        if request.path.startswith("/api/"):
+            return jsonify({"ok": 0, "erro": "Disponível somente na rede da loja."}), 403
+        return Response("O painel do GalviTracks está disponível somente na rede da loja.\n",
+                        status=403, mimetype="text/plain")
+    if request.path == "/api/gps/owntracks" and not _cfg().OWNTRACKS_TOKEN:
+        log.warning("Posição recebida pela internet sem OWNTRACKS_TOKEN definido: recusada.")
+        return jsonify({"erro": "Defina OWNTRACKS_TOKEN no servidor para receber posições pela internet."}), 403
+    return None
 
 
 # --- Interface ---

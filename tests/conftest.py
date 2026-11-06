@@ -18,6 +18,7 @@ def cfg(tmp_path):
         DB_PATH = tmp_path / "teste.db"
         ARQUIVO_SESSAO = tmp_path / "sessao.json"
         OWNTRACKS_TOKEN = ""
+        NGROK_DOMAIN = ""
 
     return ConfigTeste
 

@@ -13,8 +13,11 @@ def criar_servidor(app, port):
     from waitress import create_server
 
     cfg = app.extensions["radar"]["config"]
+    # clear_untrusted_proxy_headers=False: o waitress apagaria o X-Forwarded-For que o túnel
+    # acrescenta, e é por ele que a API reconhece (e bloqueia) quem chega pela internet.
     return create_server(app, host=cfg.HOST, port=port, threads=cfg.THREADS,
-                         send_bytes=1, channel_timeout=120, channel_request_lookahead=1)
+                         send_bytes=1, channel_timeout=120, channel_request_lookahead=1,
+                         clear_untrusted_proxy_headers=False)
 
 
 def main():
