@@ -75,6 +75,16 @@ Instalação manual, túnel para os celulares (ngrok) e configuração do app Ow
 | 5 | **Replay de trilha** | Reproduz o percurso do motoboy em um dia, para auditoria e avaliação. | ✅ |
 | 6 | **Alertas de status** | Avisa no painel quando o motoboy fica sem sinal, parado muito tempo fora de um cliente ou com bateria baixa no celular. | ✅ |
 
+### O painel
+
+- **Mapa fluido:** cada motoboy tem um marcador fixo que desliza entre as leituras de GPS (animação a cada quadro), gira na direção do movimento e não pisca ao atualizar. Motoboy sem sinal aparece esmaecido com o tempo desde a última posição.
+- **Tempo real:** usa Server-Sent Events (`/api/stream`) quando o servidor oferece e volta sozinho ao polling de 2 s se o stream cair. O indicador no topo mostra *Ao vivo*, *Atualizando* ou *Sem conexão*.
+- **Visão da frota:** cartões com status, velocidade, bateria e alertas; resumo do dia no topo (em rota, disponíveis, alertas, entregas e km); central de alertas com aviso na tela e som opcional para alertas críticos.
+- **Montagem da rota:** busca única com autocompletar (clientes cadastrados primeiro, depois endereços), paradas numeradas no mapa e na lista, estimativa de tempo e distância e botão de saída que exige o nº da nota.
+- **Clientes:** cadastro pelo botão *Novo cliente* (clique no mapa para posicionar), com telefone e cor do pino; edição e exclusão em lista com filtro.
+- **Histórico e replay:** filtros rápidos (Hoje, 7 dias, Este mês), totais do período e exportação Excel; replay com play/pausa, velocidades 1×/4×/16× e trilha colorida pela velocidade.
+- **Uso confortável:** tema claro e escuro (segue o sistema, com botão para alternar), layout de celular com painel deslizante, atalhos de teclado (`/` busca, `1`–`9` motoboy, `Esc` fecha) e foco visível em todos os controles.
+
 ## Contexto e problema
 
 A **Radar Auto Peças** faz boa parte das suas vendas com **entrega por motoboy**. O despacho era manual: não havia rastreamento dos entregadores, cálculo de rotas nem registro estruturado das viagens, e a situação de cada motoboy era acompanhada por telefone ou WhatsApp. As consequências eram:
@@ -148,7 +158,7 @@ rastreamento-motoboys-galvitech/
 │   ├── geo.py                # haversine, velocidade, vizinho mais próximo
 │   ├── roteamento.py         # OSRM + fallback offline + Nominatim
 │   ├── templates/index.html  # painel
-│   └── static/               # CSS e JavaScript do painel
+│   └── static/               # CSS (design system) e módulos JS do painel (js/main.js)
 ├── config/motoboys.example.json
 ├── scripts/
 │   ├── seed_demo.py          # clientes fictícios
