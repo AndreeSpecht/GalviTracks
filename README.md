@@ -2,7 +2,7 @@
 
 Sistema de rastreamento, roteirização e histórico de entregas por motoboy da **Radar Auto Peças** (Jaraguá do Sul/SC), desenvolvido pela **Galvitech Ltda** com tecnologias abertas e sem custos de licenciamento.
 
-[![Testes](https://github.com/AndreeSpecht/rastreamento-motoboys-galvitech/actions/workflows/testes.yml/badge.svg)](https://github.com/AndreeSpecht/rastreamento-motoboys-galvitech/actions/workflows/testes.yml)
+[![Testes](https://github.com/AndreeSpecht/GalviTracks/actions/workflows/testes.yml/badge.svg)](https://github.com/AndreeSpecht/GalviTracks/actions/workflows/testes.yml)
 ![Versão](https://img.shields.io/badge/vers%C3%A3o-0.8.0-blue?style=flat-square)
 ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow?style=flat-square)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)
@@ -49,13 +49,13 @@ Abra a pasta do projeto e dê dois cliques em **`GalviTracks.exe`**. Ele faz tud
 
 Para encerrar, feche a janela do GalviTracks: o servidor e o túnel fecham junto. Se o programa já estiver aberto, um novo clique só abre o painel.
 
-Para obter o projeto: `git clone https://github.com/AndreeSpecht/rastreamento-motoboys-galvitech.git GalviTracks`.
+Para obter o projeto: `git clone https://github.com/AndreeSpecht/GalviTracks.git`.
 
 **Linux / macOS**
 
 ```bash
-git clone https://github.com/AndreeSpecht/rastreamento-motoboys-galvitech.git
-cd rastreamento-motoboys-galvitech
+git clone https://github.com/AndreeSpecht/GalviTracks.git
+cd GalviTracks
 ./instalar.sh && ./iniciar.sh
 ```
 
@@ -151,7 +151,7 @@ Detalhes, diagramas de estado e sequência e as decisões de projeto estão em [
 ## Estrutura do repositório
 
 ```
-rastreamento-motoboys-galvitech/
+GalviTracks/
 ├── radar_tracker/            # aplicação (pacote Python)
 │   ├── __init__.py           # create_app()
 │   ├── api.py                # endpoints REST + OwnTracks + Excel
@@ -207,7 +207,7 @@ Resultados esperados:
 
 ## Cronograma de entregas
 
-Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento completo e editável: **[docs/Cronograma_Entregas_TCC.docx](docs/Cronograma_Entregas_TCC.docx)** · versão web: [docs/cronograma.md](docs/cronograma.md). As semanas futuras estão nos [milestones do GitHub](https://github.com/AndreeSpecht/rastreamento-motoboys-galvitech/milestones).
+Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento completo e editável: **[docs/Cronograma_Entregas_TCC.docx](docs/Cronograma_Entregas_TCC.docx)** · versão web: [docs/cronograma.md](docs/cronograma.md). As semanas futuras estão nos [milestones do GitHub](https://github.com/AndreeSpecht/GalviTracks/milestones).
 
 | Sem. | Sexta | Entrega | Status |
 |:---:|:---:|---|:---:|

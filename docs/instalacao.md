@@ -21,8 +21,8 @@ O executável é compilado de [`scripts/windows/launcher/GalviTracks.cs`](../scr
 ### Linux / macOS
 
 ```bash
-git clone https://github.com/AndreeSpecht/rastreamento-motoboys-galvitech.git
-cd rastreamento-motoboys-galvitech
+git clone https://github.com/AndreeSpecht/GalviTracks.git
+cd GalviTracks
 ./instalar.sh
 ./iniciar.sh
 ```

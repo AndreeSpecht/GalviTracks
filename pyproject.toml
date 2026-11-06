@@ -1,5 +1,5 @@
 [project]
-name = "rastreamento-motoboys-galvitech"
+name = "galvitracks"
 version = "0.8.0"
 description = "Sistema de rastreamento em tempo real de motoboys da Radar Auto Peças (Galvitech Ltda)"
 requires-python = ">=3.10"

@@ -45,7 +45,7 @@ def buscar_endereco(texto, config, sessao=requests):
         resp = sessao.get(
             f"{config.NOMINATIM_URL.rstrip('/')}/search",
             params={"q": f"{texto}, {config.CIDADE_BUSCA}", "format": "json", "limit": 1},
-            headers={"User-Agent": "rastreamento-motoboys-galvitech/0.8"},
+            headers={"User-Agent": "GalviTracks/0.8"},
             timeout=5,
         )
         resp.raise_for_status()

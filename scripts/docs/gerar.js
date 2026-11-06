@@ -9,7 +9,7 @@ const { semanas, marcos, riscos } = require('./dados');
 
 const SAIDA = process.argv[2];
 const ULTIMA = [...semanas].reverse().find((s) => s.status === 'Concluída');
-const REPO = 'https://github.com/AndreeSpecht/rastreamento-motoboys-galvitech';
+const REPO = 'https://github.com/AndreeSpecht/GalviTracks';
 
 // Verificação: todas as datas precisam ser sextas-feiras
 semanas.forEach((s) => {
