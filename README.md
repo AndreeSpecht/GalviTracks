@@ -84,13 +84,12 @@ git clone https://github.com/AndreeSpecht/GalviTracks.git
 
 **3. Abra.** Dê dois cliques em `GalviTracks\GalviTracks.exe`. Na primeira vez ele instala o ambiente Python (alguns minutos); depois sobe o servidor e abre o painel com os clientes da loja.
 
-**4. Libere o túnel para os celulares (uma vez por PC).** O authtoken do ngrok é pessoal e não fica no repositório. Copie o seu em [dashboard.ngrok.com](https://dashboard.ngrok.com/get-started/your-authtoken) e rode, dentro da pasta `GalviTracks`:
+**4. Responda às duas perguntas da primeira vez.** Na primeira execução em cada PC, a janela do GalviTracks pede duas senhas, que ficam só nesse computador e **não** vão para o GitHub:
 
-```bat
-tools\ngrok.exe config add-authtoken SEU_TOKEN_AQUI
-```
+- **Senha dos celulares:** a mesma configurada no app OwnTracks de cada motoboy (*Identificação → Senha*). Fica salva no arquivo `.env.local`.
+- **Authtoken do ngrok:** o GalviTracks abre a página [dashboard.ngrok.com](https://dashboard.ngrok.com/get-started/your-authtoken); copie o token e cole na janela (botão direito ou Ctrl+V). Fica salvo na configuração do ngrok desse PC.
 
-O túnel também só abre com `OWNTRACKS_TOKEN` preenchido no `.env` (a mesma senha configurada no app OwnTracks dos motoboys). Sem o túnel, o painel funciona normalmente, mas as posições dos celulares não chegam.
+As senhas aparecem como `*` enquanto você digita. Se apertar Enter sem digitar, o GalviTracks abre só o painel, sem o túnel: as posições dos celulares não chegam, e ele pergunta de novo na próxima vez. Para trocar a senha dos celulares depois, edite ou apague o `.env.local`; para trocar o authtoken, rode `tools\ngrok.exe config add-authtoken NOVO_TOKEN`.
 
 **Mantendo os dados iguais entre os PCs.** O banco não sincroniza sozinho: ele vai para o GitHub como um arquivo.
 
@@ -185,7 +184,7 @@ Detalhes, diagramas de estado e sequência e as decisões de projeto estão em [
 | Geocodificação | **Nominatim** | Busca de endereços |
 | Visualização | **Leaflet.js** | Mapa interativo |
 | Relatórios | **openpyxl** | Exportação do histórico em Excel |
-| Qualidade | **pytest · GitHub Actions** | 105 testes em Windows e Ubuntu |
+| Qualidade | **pytest · GitHub Actions** | 108 testes em Windows e Ubuntu |
 
 ## Estrutura do repositório
 

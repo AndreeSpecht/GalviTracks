@@ -6,6 +6,8 @@ cd /d "%~dp0..\.."
 
 rem Le NGROK_DOMAIN e PORT do arquivo .env
 for /f "usebackq eol=# tokens=1,* delims==" %%a in (".env") do set "%%a=%%b"
+rem .env.local guarda as senhas deste PC (fora do git) e tem prioridade
+if exist .env.local for /f "usebackq eol=# tokens=1,* delims==" %%a in (".env.local") do set "%%a=%%b"
 if not defined PORT set "PORT=5000"
 
 rem Sem token qualquer pessoa na internet poderia enviar posicoes falsas

@@ -14,7 +14,7 @@ Dê dois cliques em **`GalviTracks.exe`**, na raiz do projeto. Na primeira execu
 
 O repositório já traz o banco da loja (`data/radar.db`, com os clientes), o `.env`, o `config/motoboys.json` e o `tools/ngrok.exe`, então um clone em outro PC abre com os mesmos dados. Se algum deles faltar, o launcher copia `.env.example` → `.env` e `config/motoboys.example.json` → `config/motoboys.json`, e cadastra clientes de demonstração quando o banco está vazio.
 
-**Em um PC novo**, falta só uma coisa para o túnel: o authtoken do ngrok, que é pessoal e **não** vai para o repositório público. Rode uma vez `tools\ngrok.exe config add-authtoken <seu-token>` (o token fica em [dashboard.ngrok.com](https://dashboard.ngrok.com/get-started/your-authtoken)).
+**Em um PC novo**, o `GalviTracks.exe` pergunta na primeira vez as duas senhas que **não** vão para o repositório público: a senha dos celulares (`OWNTRACKS_TOKEN`, salva em `.env.local`, que fica fora do git) e o authtoken do ngrok (salvo na configuração do ngrok do PC; o exe abre [a página do token](https://dashboard.ngrok.com/get-started/your-authtoken)). Enter sem digitar pula a pergunta e abre só o painel. O `.env.local` tem prioridade sobre o `.env` e também é lido pelo `tunel_ngrok.bat`.
 
 **Levar as alterações do banco para o GitHub:** feche o GalviTracks (assim tudo é gravado no `radar.db`) e faça commit e push do `data/radar.db`. Evite usar o sistema em dois PCs ao mesmo tempo: cada um teria um banco diferente e o git não consegue juntar os dois.
 

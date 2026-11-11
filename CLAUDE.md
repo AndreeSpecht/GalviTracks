@@ -38,7 +38,7 @@ Rotas: OSRM público (fallback offline por Haversine) · Endereços: Nominatim �
 | `scripts/windows/launcher/` | código-fonte do `GalviTracks.exe` (`GalviTracks.cs`, C# 5) + `compilar.bat` |
 | `scripts/windows/tunel_ngrok.bat` | abre só o túnel |
 | `scripts/docs/` | gerador do cronograma: `dados.js` (fonte) + `gerar.js` → `.docx` e `.md` |
-| `tests/` | pytest (105 testes) |
+| `tests/` | pytest (108 testes) |
 
 Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dados, desenvolvimento, cronograma) e `CHANGELOG.md`.
 
@@ -46,7 +46,8 @@ Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dado
 
 - Fica na raiz e é versionado. Um clique: na primeira vez cria o `.venv` e instala as dependências (refaz quando o hash do `requirements.txt` muda), copia `.env.example`/`motoboys.example.json` se faltarem, abre o túnel ngrok, sobe `run.py` e abre o painel. Fechar a janela encerra tudo (job object por processo filho). Se já estiver rodando, só abre o painel.
 - Opções: `--sem-tunel`, `--sem-navegador`.
-- O túnel só abre se `NGROK_DOMAIN` **e** `OWNTRACKS_TOKEN` estiverem no `.env` e existir `tools\ngrok.exe` (ou ngrok no PATH). Log em `data\ngrok.log`.
+- O túnel só abre se `NGROK_DOMAIN` (no `.env`) **e** `OWNTRACKS_TOKEN` (no `.env.local` ou `.env`) estiverem definidos, existir `tools\ngrok.exe` (ou ngrok no PATH) e o ngrok tiver authtoken. Log em `data\ngrok.log`.
+- **Primeira execução num PC:** se falta o `OWNTRACKS_TOKEN`, o exe pergunta e grava em `.env.local`; se o `ngrok.yml` (`%LOCALAPPDATA%\ngrok\ngrok.yml`, `~\.ngrok2`, `~\.config\ngrok` ou `NGROK_AUTHTOKEN`) não tem authtoken, abre a página do token e roda `ngrok config add-authtoken`. Leitura mascarada com `*`; com stdin redirecionado usa `ReadLine` (dá para testar com `printf 'senha\n' | ./GalviTracks.exe`). Enter pula e abre só o painel.
 - **Recompilar depois de mudar o `.cs`**: no PowerShell, `& cmd.exe /c "C:\Users\radar\OneDrive\Desktop\GalviTracks\scripts\windows\launcher\compilar.bat"` (usa o `csc.exe` do .NET Framework 4; só C# 5, sem interpolação de string `$""`). `cmd //c compilar.bat` pelo Git Bash não funciona.
 
 ## Segurança (estado em 06/11/2026)
@@ -61,7 +62,7 @@ Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dado
 
 - **Decisão do André (11/11/2026):** o repositório é **público** e mesmo assim versiona `data/radar.db` (clientes reais da loja, com endereço e telefone), `.env`, `config/motoboys.json` e `tools/ngrok.exe`, para que um clone em qualquer PC funcione com os dados. Ele foi avisado de que os dados ficam públicos.
 - Continuam fora do git: `data/*.db-wal`, `data/*.db-shm`, `data/ngrok.log`, `data/sessao.json`, `tools/cloudflared.exe` (68 MB, não usado pelo launcher), `Entrega_Professora/`, `_legado_local/`, `.venv/`, `scripts/docs/node_modules/`.
-- **Nunca commitar segredos** no `.env`: nem o authtoken do ngrok (daria a qualquer um o domínio da loja e as posições dos motoboys) nem o `OWNTRACKS_TOKEN` real. O authtoken do ngrok fica no `ngrok.yml` de cada PC (`tools\ngrok.exe config add-authtoken ...`). O `OWNTRACKS_TOKEN` ainda está vazio no `.env` (11/11/2026), então o túnel não abre; falta decidir com o André onde guardar o token sem publicá-lo.
+- **Nunca commitar segredos** no `.env`: nem o authtoken do ngrok (daria a qualquer um o domínio da loja e as posições dos motoboys) nem o `OWNTRACKS_TOKEN` real. O authtoken do ngrok fica no `ngrok.yml` de cada PC (`tools\ngrok.exe config add-authtoken ...`). O `OWNTRACKS_TOKEN` fica no `.env.local` (fora do git, prioridade sobre o `.env`; `config.carregar_arquivos_env()`), criado pelo exe na primeira execução de cada PC.
 - Passo a passo para clonar em outro PC e sincronizar o banco: seção "Usar em outro PC" do README.
 - Para commitar o banco, o GalviTracks deve estar fechado (ou fazer antes `PRAGMA wal_checkpoint(FULL)`), senão alterações recentes ficam só no `-wal`.
 - **Nunca use `data/radar.db` em testes ou experimentos.** Para subir um servidor de teste isolado:
@@ -103,10 +104,12 @@ cd scripts/docs && npm install && npm run gerar   # regenera docs/Cronograma_Ent
   2. Cronograma replanejado: semanas 10–12 registradas como entregues (10 tempo real, 11 painel, 12 GalviTracks.exe), com observação de que foram publicadas em 06/11. **Confirmação de entrega por parada retirada do escopo** (trabalho futuro). Login passou para a semana 13. Milestones do GitHub ajustados: 10–12 fechados; issues #34–#36 fechadas como "not planned"; #38 concluída; #37 e #39 (indicadores por motoboy, Excel com indicadores) abertas **sem milestone**; #40–#42 (login, perfis, proteção da API) movidas para o milestone da semana 13.
   3. Segurança do túnel (merge `da5b4c5`): bloqueio do acesso externo, token obrigatório pela internet, exe e `tunel_ngrok.bat` não abrem túnel sem token, correção do waitress, 22 testes novos.
 
+- **11/11/2026**: o André pediu que o clone funcione em qualquer PC com os dados. Versionados `data/radar.db`, `.env`, `config/motoboys.json` e `tools/ngrok.exe` (repositório público, por decisão dele). README ganhou a seção "Usar em outro PC" (clonar, `git pull` antes de usar, commit do `data/radar.db` depois, um PC por vez). `.env.local` para senhas e perguntas da primeira execução no `GalviTracks.exe` (branch `feat/primeira-execucao`).
+
 ## Pendências e próximos passos (por prioridade)
 
 1. **Login de operador (semana 13)**: versão enxuta, senha com hash no `.env` e sessão do Flask; perfis operador/gestor (#41) são opcionais. Issues #40–#42.
-2. **Token do OwnTracks**: `NGROK_DOMAIN` já está no `.env`; falta o `OWNTRACKS_TOKEN` (sem publicá-lo no repositório público) e a mesma senha no OwnTracks dos celulares; depois testar um motoboy real com dados móveis. O exe já foi visto recusando o túnel com domínio preenchido e token vazio (11/11).
+2. **Primeiro uso real do túnel**: o André abre o `GalviTracks.exe`, digita a senha dos celulares (vai para o `.env.local`), coloca a mesma senha no OwnTracks dos motoboys e testa um motoboy real com dados móveis. As perguntas da primeira execução foram testadas em 11/11 numa cópia do projeto (senha, authtoken com o `ngrok.yml` removido e restaurado, e Enter para pular).
 3. **Cronometragem de base (semana 14, 06/11)**: medir o tempo de planejamento de rotas no processo manual atual. Não depende do sistema; dá para começar já. Sugerido preparar planilha e protocolo de medição.
 4. **Homologação na loja + release v0.9.0** (marco M3, data original 30/10 já passou; atualizar status/data quando acontecer). Lembrar de subir `__version__` e o selo do README.
 5. Piloto com cronometragem (semana 15), questionário **SUS** (semana 16, meta ≥ 71), análise e artigo (17), **v1.0.0** e defesa (18, 04/12).

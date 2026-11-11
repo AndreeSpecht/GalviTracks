@@ -11,8 +11,20 @@ except ImportError:  # python-dotenv é opcional em tempo de execução
 
 RAIZ_PROJETO = Path(__file__).resolve().parent.parent
 
-if load_dotenv:
-    load_dotenv(RAIZ_PROJETO / ".env")
+
+
+def carregar_arquivos_env(pasta=RAIZ_PROJETO):
+    """Carrega .env.local (senhas deste PC, fora do git) e depois .env (versionado).
+
+    O load_dotenv não sobrescreve o que já existe, então a prioridade fica:
+    variáveis de ambiente > .env.local > .env.
+    """
+    if load_dotenv:
+        load_dotenv(Path(pasta) / ".env.local")
+        load_dotenv(Path(pasta) / ".env")
+
+
+carregar_arquivos_env()
 
 
 def _env(nome, padrao):

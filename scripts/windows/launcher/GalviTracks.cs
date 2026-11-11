@@ -26,6 +26,7 @@ using System.Threading;
 static class GalviTracks
 {
     static string raiz;
+    static bool semNavegador;
     // Um job por processo filho; os handles ficam abertos enquanto esta janela existir.
     static readonly List<IntPtr> jobs = new List<IntPtr>();
 
@@ -36,13 +37,16 @@ static class GalviTracks
         raiz = AppDomain.CurrentDomain.BaseDirectory;
         Directory.SetCurrentDirectory(raiz);
         bool semTunel = Array.IndexOf(args, "--sem-tunel") >= 0;
-        bool semNavegador = Array.IndexOf(args, "--sem-navegador") >= 0;
+        semNavegador = Array.IndexOf(args, "--sem-navegador") >= 0;
 
         Cabecalho();
         try
         {
             string python = PrepararAmbiente();
+            // .env vem do GitHub; .env.local guarda as senhas deste PC e tem prioridade.
             Dictionary<string, string> env = LerEnv(Path.Combine(raiz, ".env"));
+            foreach (KeyValuePair<string, string> kv in LerEnv(Path.Combine(raiz, ".env.local")))
+                if (kv.Value.Length > 0) env[kv.Key] = kv.Value;
             string porta = Valor(env, "PORT", "5000");
             string urlPainel = "http://127.0.0.1:" + porta;
 
@@ -156,18 +160,22 @@ static class GalviTracks
             Aviso("Túnel para os celulares desligado (NGROK_DOMAIN vazio no .env). O painel funciona normalmente.");
             return null;
         }
-        if (string.IsNullOrEmpty(token))
-        {
-            // Sem token qualquer pessoa na internet poderia enviar posições falsas.
-            Aviso("Túnel NÃO aberto: defina OWNTRACKS_TOKEN no .env (a mesma senha configurada no app");
-            Aviso("OwnTracks dos motoboys). O painel funciona normalmente nesta rede.");
-            return null;
-        }
         string ngrok = Path.Combine(raiz, @"tools\ngrok.exe");
         if (!File.Exists(ngrok)) ngrok = NoPath("ngrok.exe");
         if (ngrok == null)
         {
             Aviso("ngrok não encontrado (tools\\ngrok.exe). Os celulares não conseguirão enviar posições de fora da rede.");
+            return null;
+        }
+        // Sem token qualquer pessoa na internet poderia enviar posições falsas: pergunta na primeira vez.
+        if (string.IsNullOrEmpty(token) && PerguntarSenhaOwnTracks() == null)
+        {
+            Aviso("Túnel NÃO aberto: falta a senha do OwnTracks. O painel funciona normalmente nesta rede.");
+            return null;
+        }
+        if (!NgrokTemAuthtoken() && !ConfigurarAuthtoken(ngrok))
+        {
+            Aviso("Túnel NÃO aberto: falta o authtoken do ngrok neste PC. O painel funciona normalmente nesta rede.");
             return null;
         }
         Etapa("Abrindo o túnel para os celulares (" + dominio + ")");
@@ -178,10 +186,143 @@ static class GalviTracks
         Thread.Sleep(2500);
         if (p.HasExited)
         {
-            Aviso("O túnel não abriu (talvez já esteja aberto em outro lugar). Detalhes em data\\ngrok.log.");
+            Aviso("O túnel não abriu (talvez já esteja aberto em outro lugar ou o authtoken esteja errado).");
+            Aviso("Detalhes em data\\ngrok.log. Para trocar o authtoken: tools\\ngrok.exe config add-authtoken NOVO_TOKEN");
             return null;
         }
         return p;
+    }
+
+    // --- Primeira execução num PC novo -----------------------------------------
+    /// Pede a senha do OwnTracks e a guarda em .env.local (fora do git). Devolve null se pulou.
+    static string PerguntarSenhaOwnTracks()
+    {
+        Etapa("Senha dos celulares (só na primeira vez neste PC)");
+        Info("Para receber as posições pela internet, o GalviTracks precisa da senha configurada");
+        Info("no app OwnTracks dos motoboys (Identificação > Senha). Ela fica salva só neste PC,");
+        Info("no arquivo .env.local, que não vai para o GitHub.");
+        while (true)
+        {
+            string senha = LerSegredo("   Digite a senha (ou Enter para pular): ");
+            if (senha.Length == 0) return null;
+            if (senha.IndexOfAny(new[] { ' ', '#', '"', '\'' }) >= 0)
+            {
+                Aviso("A senha não pode ter espaços, aspas nem #. Tente de novo.");
+                continue;
+            }
+            if (senha.Length < 6)
+            {
+                Aviso("Use pelo menos 6 caracteres. Tente de novo.");
+                continue;
+            }
+            SalvarEnvLocal("OWNTRACKS_TOKEN", senha);
+            Info("Senha salva em .env.local. Use a mesma no OwnTracks de cada motoboy.");
+            return senha;
+        }
+    }
+
+    static bool NgrokTemAuthtoken()
+    {
+        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NGROK_AUTHTOKEN"))) return true;
+        string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string perfil = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        string[] arquivos =
+        {
+            Path.Combine(local, @"ngrok\ngrok.yml"),
+            Path.Combine(perfil, @".ngrok2\ngrok.yml"),
+            Path.Combine(perfil, @".config\ngrok\ngrok.yml"),
+        };
+        foreach (string arquivo in arquivos)
+        {
+            if (!File.Exists(arquivo)) continue;
+            foreach (string linha in File.ReadAllLines(arquivo))
+            {
+                string l = linha.Trim();
+                if (l.StartsWith("authtoken:") && l.Substring(10).Trim().Trim('"', '\'').Length > 0) return true;
+            }
+        }
+        return false;
+    }
+
+    /// Pede o authtoken da conta ngrok e o grava na configuração do ngrok deste PC.
+    static bool ConfigurarAuthtoken(string ngrok)
+    {
+        Etapa("Configurar o ngrok neste PC (só uma vez)");
+        Info("O túnel precisa do authtoken da sua conta ngrok. Ele é pessoal e não vai para o GitHub.");
+        Info("Ele aparece em https://dashboard.ngrok.com/get-started/your-authtoken" + (semNavegador ? "" : " (abrindo agora)") + ".");
+        Info("Copie o token e cole aqui (botão direito ou Ctrl+V).");
+        if (!semNavegador) AbrirNavegador("https://dashboard.ngrok.com/get-started/your-authtoken");
+        for (int tentativa = 0; tentativa < 3; tentativa++)
+        {
+            string token = LerSegredo("   Authtoken do ngrok (ou Enter para pular): ");
+            if (token.Length == 0) return false;
+            if (token.IndexOfAny(new[] { ' ', '"', '\'', '&', '|', '<', '>' }) >= 0)
+            {
+                Aviso("Esse texto não parece um authtoken. Copie só o token e tente de novo.");
+                continue;
+            }
+            var psi = new ProcessStartInfo(ngrok, "config add-authtoken " + token)
+            {
+                UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true
+            };
+            using (Process p = Process.Start(psi))
+            {
+                string saida = p.StandardOutput.ReadToEnd() + p.StandardError.ReadToEnd();
+                p.WaitForExit(15000);
+                if (p.ExitCode == 0)
+                {
+                    Info("Authtoken salvo na configuração do ngrok deste PC.");
+                    return true;
+                }
+                Aviso("O ngrok recusou o authtoken: " + saida.Trim());
+            }
+        }
+        return false;
+    }
+
+    /// Lê uma senha mostrando * no lugar dos caracteres.
+    static string LerSegredo(string pergunta)
+    {
+        Console.Write(pergunta);
+        if (Console.IsInputRedirected)
+        {
+            string linha = Console.ReadLine();
+            Console.WriteLine();
+            return linha == null ? "" : linha.Trim();
+        }
+        var sb = new StringBuilder();
+        while (true)
+        {
+            ConsoleKeyInfo tecla = Console.ReadKey(true);
+            if (tecla.Key == ConsoleKey.Enter) { Console.WriteLine(); break; }
+            if (tecla.Key == ConsoleKey.Backspace)
+            {
+                if (sb.Length > 0) { sb.Length--; Console.Write("\b \b"); }
+                continue;
+            }
+            if (!char.IsControl(tecla.KeyChar)) { sb.Append(tecla.KeyChar); Console.Write('*'); }
+        }
+        return sb.ToString().Trim();
+    }
+
+    /// Grava CHAVE=valor em .env.local, substituindo a linha se já existir.
+    static void SalvarEnvLocal(string chave, string valor)
+    {
+        string caminho = Path.Combine(raiz, ".env.local");
+        var linhas = File.Exists(caminho)
+            ? new List<string>(File.ReadAllLines(caminho))
+            : new List<string> { "# Senhas deste PC. NÃO vai para o GitHub (está no .gitignore).", "# Tem prioridade sobre o .env." };
+        bool achou = false;
+        for (int i = 0; i < linhas.Count; i++)
+        {
+            if (linhas[i].TrimStart().StartsWith(chave + "="))
+            {
+                linhas[i] = chave + "=" + valor;
+                achou = true;
+            }
+        }
+        if (!achou) linhas.Add(chave + "=" + valor);
+        File.WriteAllLines(caminho, linhas.ToArray(), new UTF8Encoding(false));
     }
 
     // --- Processos ---------------------------------------------------------
