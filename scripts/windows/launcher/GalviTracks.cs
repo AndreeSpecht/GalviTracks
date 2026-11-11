@@ -249,8 +249,8 @@ static class GalviTracks
     {
         Etapa("Configurar o ngrok neste PC (só uma vez)");
         Info("O túnel precisa do authtoken da sua conta ngrok. Ele é pessoal e não vai para o GitHub.");
-        Info("Abrindo a página onde ele aparece: copie o token e cole aqui (botão direito ou Ctrl+V).");
-        Info("Endereço: https://dashboard.ngrok.com/get-started/your-authtoken");
+        Info("Ele aparece em https://dashboard.ngrok.com/get-started/your-authtoken" + (semNavegador ? "" : " (abrindo agora)") + ".");
+        Info("Copie o token e cole aqui (botão direito ou Ctrl+V).");
         if (!semNavegador) AbrirNavegador("https://dashboard.ngrok.com/get-started/your-authtoken");
         for (int tentativa = 0; tentativa < 3; tentativa++)
         {
@@ -287,6 +287,7 @@ static class GalviTracks
         if (Console.IsInputRedirected)
         {
             string linha = Console.ReadLine();
+            Console.WriteLine();
             return linha == null ? "" : linha.Trim();
         }
         var sb = new StringBuilder();
