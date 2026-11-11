@@ -20,6 +20,7 @@ Sistema de rastreamento, roteirização e histórico de entregas por motoboy da 
 ## Sumário
 
 - [Início rápido](#início-rápido)
+- [Usar em outro PC](#usar-em-outro-pc)
 - [Funcionalidades](#funcionalidades)
 - [Contexto e problema](#contexto-e-problema)
 - [Proposta, escopo e diferencial](#proposta-escopo-e-diferencial)
@@ -49,7 +50,7 @@ Abra a pasta do projeto e dê dois cliques em **`GalviTracks.exe`**. Ele faz tud
 
 Para encerrar, feche a janela do GalviTracks: o servidor e o túnel fecham junto. Se o programa já estiver aberto, um novo clique só abre o painel.
 
-Para obter o projeto: `git clone https://github.com/AndreeSpecht/GalviTracks.git`.
+Para obter o projeto em outro computador, veja [Usar em outro PC](#usar-em-outro-pc).
 
 **Linux / macOS**
 
@@ -59,13 +60,51 @@ cd GalviTracks
 ./instalar.sh && ./iniciar.sh
 ```
 
-O painel abre em **http://127.0.0.1:5000** com clientes de demonstração. Para ver um motoboy andando sem celular, monte uma rota no painel e execute:
+O painel abre em **http://127.0.0.1:5000** com os clientes da loja (ou com clientes de demonstração, se o banco estiver vazio). Para ver um motoboy andando sem celular, monte uma rota no painel e execute:
 
 ```bash
 python scripts/simular_motoboy.py --tid 0      # use .venv\Scripts\python no Windows
 ```
 
 Instalação manual, túnel para os celulares (ngrok) e configuração do app OwnTracks estão em **[docs/instalacao.md](docs/instalacao.md)**.
+
+## Usar em outro PC
+
+O repositório já traz tudo o que o sistema precisa: o banco da loja (`data/radar.db`, com os clientes e o histórico), o `.env`, os motoboys (`config/motoboys.json`) e o `tools/ngrok.exe`. Num computador novo com Windows:
+
+**1. Instale uma vez**
+- [Python 3.10 ou mais novo](https://www.python.org/downloads/): na instalação, marque **Add python.exe to PATH**.
+- [Git para Windows](https://git-scm.com/download/win): pode aceitar as opções padrão.
+
+**2. Baixe o projeto.** Abra o *Prompt de Comando* na pasta onde quer guardar (por exemplo, a Área de Trabalho) e rode:
+
+```bat
+git clone https://github.com/AndreeSpecht/GalviTracks.git
+```
+
+**3. Abra.** Dê dois cliques em `GalviTracks\GalviTracks.exe`. Na primeira vez ele instala o ambiente Python (alguns minutos); depois sobe o servidor e abre o painel com os clientes da loja.
+
+**4. Libere o túnel para os celulares (uma vez por PC).** O authtoken do ngrok é pessoal e não fica no repositório. Copie o seu em [dashboard.ngrok.com](https://dashboard.ngrok.com/get-started/your-authtoken) e rode, dentro da pasta `GalviTracks`:
+
+```bat
+tools\ngrok.exe config add-authtoken SEU_TOKEN_AQUI
+```
+
+O túnel também só abre com `OWNTRACKS_TOKEN` preenchido no `.env` (a mesma senha configurada no app OwnTracks dos motoboys). Sem o túnel, o painel funciona normalmente, mas as posições dos celulares não chegam.
+
+**Mantendo os dados iguais entre os PCs.** O banco não sincroniza sozinho: ele vai para o GitHub como um arquivo.
+
+- **Antes de usar**, pegue a versão mais recente: na pasta `GalviTracks`, rode `git pull`.
+- **Depois de usar**, feche a janela do GalviTracks (assim tudo é gravado no banco) e envie:
+
+  ```bat
+  git add data/radar.db
+  git commit -m "chore: atualiza o banco da loja"
+  git push
+  ```
+
+  No primeiro `git push` o Windows pede para entrar na conta do GitHub. Se o Git pedir nome e e-mail, configure uma vez com `git config --global user.name "Seu Nome"` e `git config --global user.email "seu@email"`.
+- **Use o sistema em um PC por vez.** Se dois PCs alterarem o banco ao mesmo tempo, o Git não consegue juntar os dois e uma das versões precisa ser descartada.
 
 ## Funcionalidades
 

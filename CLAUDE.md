@@ -62,6 +62,7 @@ Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dado
 - **Decisão do André (11/11/2026):** o repositório é **público** e mesmo assim versiona `data/radar.db` (clientes reais da loja, com endereço e telefone), `.env`, `config/motoboys.json` e `tools/ngrok.exe`, para que um clone em qualquer PC funcione com os dados. Ele foi avisado de que os dados ficam públicos.
 - Continuam fora do git: `data/*.db-wal`, `data/*.db-shm`, `data/ngrok.log`, `data/sessao.json`, `tools/cloudflared.exe` (68 MB, não usado pelo launcher), `Entrega_Professora/`, `_legado_local/`, `.venv/`, `scripts/docs/node_modules/`.
 - **Nunca commitar segredos** no `.env`: nem o authtoken do ngrok (daria a qualquer um o domínio da loja e as posições dos motoboys) nem o `OWNTRACKS_TOKEN` real. O authtoken do ngrok fica no `ngrok.yml` de cada PC (`tools\ngrok.exe config add-authtoken ...`). O `OWNTRACKS_TOKEN` ainda está vazio no `.env` (11/11/2026), então o túnel não abre; falta decidir com o André onde guardar o token sem publicá-lo.
+- Passo a passo para clonar em outro PC e sincronizar o banco: seção "Usar em outro PC" do README.
 - Para commitar o banco, o GalviTracks deve estar fechado (ou fazer antes `PRAGMA wal_checkpoint(FULL)`), senão alterações recentes ficam só no `-wal`.
 - **Nunca use `data/radar.db` em testes ou experimentos.** Para subir um servidor de teste isolado:
   ```bash
