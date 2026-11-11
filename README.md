@@ -182,7 +182,7 @@ GalviTracks/
 
 Todas as opções ficam no arquivo `.env`, criado pelo instalador a partir de [`.env.example`](.env.example): nome e coordenadas da loja, cidade de busca, servidor OSRM, fator de atraso, token do OwnTracks e limites do filtro de GPS. Os motoboys ficam em `config/motoboys.json` (nome, cor e Tracker ID do OwnTracks).
 
-Banco, sessão, `.env` e `config/motoboys.json` **não são versionados**, para que dados reais de clientes nunca vão para o repositório público.
+O banco (`data/radar.db`, com os clientes cadastrados), o `.env`, o `config/motoboys.json` e o `tools/ngrok.exe` **são versionados**: um clone em qualquer PC já abre com os dados da loja. Para levar alterações do banco para o GitHub, feche o GalviTracks e faça commit do `data/radar.db`. Não coloque senhas no `.env` (o repositório é público); o authtoken do ngrok é configurado uma vez por PC (ver [docs/instalacao.md](docs/instalacao.md)).
 
 ## Testes
 

@@ -57,11 +57,13 @@ Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dado
 - Validado em 06/11 com túnel ngrok real (domínio da conta: `unhasty-leighton-grouty.ngrok-free.dev`).
 - **Ainda não há login de operador** (planejado para a semana 13).
 
-## Arquivos locais fora do git (nunca commitar)
+## Dados e configuração no repositório
 
-`.env`, `config/motoboys.json`, `data/` (inclui `radar.db` com **dados reais da loja**), `tools/` (`ngrok.exe`, `cloudflared.exe`), `Entrega_Professora/`, `_legado_local/`, `.venv/`, `scripts/docs/node_modules/`.
-
-- Em 06/11/2026 o `.env` real estava com `OWNTRACKS_TOKEN` e `NGROK_DOMAIN` **vazios**, então o túnel não abre até o André preenchê-los (e pôr a mesma senha no OwnTracks de cada motoboy).
+- **Decisão do André (11/11/2026):** o repositório é **público** e mesmo assim versiona `data/radar.db` (clientes reais da loja, com endereço e telefone), `.env`, `config/motoboys.json` e `tools/ngrok.exe`, para que um clone em qualquer PC funcione com os dados. Ele foi avisado de que os dados ficam públicos.
+- Continuam fora do git: `data/*.db-wal`, `data/*.db-shm`, `data/ngrok.log`, `data/sessao.json`, `tools/cloudflared.exe` (68 MB, não usado pelo launcher), `Entrega_Professora/`, `_legado_local/`, `.venv/`, `scripts/docs/node_modules/`.
+- **Nunca commitar segredos** no `.env`: nem o authtoken do ngrok (daria a qualquer um o domínio da loja e as posições dos motoboys) nem o `OWNTRACKS_TOKEN` real. O authtoken do ngrok fica no `ngrok.yml` de cada PC (`tools
+grok.exe config add-authtoken ...`). O `OWNTRACKS_TOKEN` ainda está vazio no `.env` (11/11/2026), então o túnel não abre; falta decidir com o André onde guardar o token sem publicá-lo.
+- Para commitar o banco, o GalviTracks deve estar fechado (ou fazer antes `PRAGMA wal_checkpoint(FULL)`), senão alterações recentes ficam só no `-wal`.
 - **Nunca use `data/radar.db` em testes ou experimentos.** Para subir um servidor de teste isolado:
   ```bash
   PASTA_DADOS=<pasta temporária> DB_PATH=<pasta>/t.db ARQUIVO_SESSAO=<pasta>/s.json \
@@ -104,7 +106,7 @@ cd scripts/docs && npm install && npm run gerar   # regenera docs/Cronograma_Ent
 ## Pendências e próximos passos (por prioridade)
 
 1. **Login de operador (semana 13)**: versão enxuta, senha com hash no `.env` e sessão do Flask; perfis operador/gestor (#41) são opcionais. Issues #40–#42.
-2. **André configura** `OWNTRACKS_TOKEN` + `NGROK_DOMAIN` no `.env` e a senha no OwnTracks dos celulares; testar um motoboy real com dados móveis pelo `GalviTracks.exe`. O caminho "domínio preenchido e token vazio" do exe ainda não foi executado de verdade.
+2. **Token do OwnTracks**: `NGROK_DOMAIN` já está no `.env`; falta o `OWNTRACKS_TOKEN` (sem publicá-lo no repositório público) e a mesma senha no OwnTracks dos celulares; depois testar um motoboy real com dados móveis. O exe já foi visto recusando o túnel com domínio preenchido e token vazio (11/11).
 3. **Cronometragem de base (semana 14, 06/11)**: medir o tempo de planejamento de rotas no processo manual atual. Não depende do sistema; dá para começar já. Sugerido preparar planilha e protocolo de medição.
 4. **Homologação na loja + release v0.9.0** (marco M3, data original 30/10 já passou; atualizar status/data quando acontecer). Lembrar de subir `__version__` e o selo do README.
 5. Piloto com cronometragem (semana 15), questionário **SUS** (semana 16, meta ≥ 71), análise e artigo (17), **v1.0.0** e defesa (18, 04/12).

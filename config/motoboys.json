@@ -1,0 +1,6 @@
+[
+  { "id": 0, "nome": "Guilherme Silva", "cor": "#e74c3c", "tid": "0" },
+  { "id": 1, "nome": "Victor Santos",   "cor": "#3498db", "tid": "1" },
+  { "id": 2, "nome": "Juliano Costa",   "cor": "#2ecc71", "tid": "2" },
+  { "id": 3, "nome": "Rafael Souza",    "cor": "#9b59b6", "tid": "3" }
+]
