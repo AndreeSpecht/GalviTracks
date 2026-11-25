@@ -18,19 +18,21 @@ const fmtDur = (m) => (m == null ? '—' : m < 60 ? `${m} min` : `${Math.floor(m
 
 export function abrirHistorico() {
   const hoje = new Date();
-  const inicio = el('input', { className: 'inp', type: 'date', 'aria-label': 'Data inicial', value: dataISO(hoje) });
+  const seteDias = new Date(hoje.getTime() - 6 * 864e5);
+  // Abre nos últimos 7 dias: em "Hoje" a janela fica vazia antes da primeira entrega do dia.
+  const inicio = el('input', { className: 'inp', type: 'date', 'aria-label': 'Data inicial', value: dataISO(seteDias) });
   const fim = el('input', { className: 'inp', type: 'date', 'aria-label': 'Data final', value: dataISO(hoje) });
   const tbody = el('tbody');
   const totais = el('div', { className: 'totais' });
 
   const atalhos = [
     ['Hoje', () => [hoje, hoje]],
-    ['7 dias', () => [new Date(hoje.getTime() - 6 * 864e5), hoje]],
+    ['7 dias', () => [seteDias, hoje]],
     ['Este mês', () => [new Date(hoje.getFullYear(), hoje.getMonth(), 1), hoje]],
     ['Tudo', () => [null, null]],
   ];
   const chips = atalhos.map(([rotulo, fn], i) => el('button', {
-    className: `chip${i === 0 ? ' ativo' : ''}`, type: 'button',
+    className: `chip${i === 1 ? ' ativo' : ''}`, type: 'button',
     onclick: (e) => {
       const [a, b] = fn();
       inicio.value = a ? dataISO(a) : '';
