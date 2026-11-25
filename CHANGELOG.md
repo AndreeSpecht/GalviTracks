@@ -4,6 +4,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/). 
 
 ## [Não lançado]
 
+### Portfólio
+- README reorganizado para apresentar o projeto: GIF de demonstração, telas (frota, rota, histórico, replay, tema escuro, login e celular), destaques técnicos e tecnologias.
+- Imagens em `docs/img/`, geradas por `scripts/docs/cena_demo.py` (servidor isolado com cópia do banco e motoboys simulados) e `scripts/docs/capturas_readme.py` (Playwright).
+
 ### Correções
 - `scripts/simular_motoboy.py` e `scripts/verificar_stream.py` voltaram a funcionar com o login: o simulador ganhou `--usuario`/`--senha` (ou `SIMULADOR_SENHA`) e a verificação cria um gestor temporário.
 

@@ -38,6 +38,7 @@ Rotas: OSRM público (fallback offline por Haversine) · Endereços: Nominatim �
 | `scripts/windows/launcher/` | código-fonte do `GalviTracks.exe` (`GalviTracks.cs`, C# 5) + `compilar.bat` |
 | `scripts/windows/tunel_ngrok.bat` | abre só o túnel |
 | `scripts/docs/` | gerador do cronograma: `dados.js` (fonte) + `gerar.js` → `.docx` e `.md` |
+| `scripts/docs/cena_demo.py`, `capturas_readme.py` | regeneram as imagens do README em `docs/img/` (cena isolada na porta 5098 com cópia do banco + Playwright com o Edge; Playwright e Pillow ficam num venv à parte) |
 | `tests/` | pytest (145 testes) |
 
 Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dados, desenvolvimento, cronograma) e `CHANGELOG.md`.
