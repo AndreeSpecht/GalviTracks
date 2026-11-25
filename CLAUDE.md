@@ -30,7 +30,7 @@ Rotas: OSRM público (fallback offline por Haversine) · Endereços: Nominatim �
 | `radar_tracker/alertas.py` | sem sinal, parado fora de cliente, bateria baixa |
 | `radar_tracker/geo.py`, `roteamento.py` | haversine, vizinho mais próximo, OSRM/Nominatim |
 | `radar_tracker/static/js/main.js` | entrada do painel (módulos: mapa, marcadores, tempo-real, rota, busca, clientes, historico, replay, resumo, notificacoes, ui...) |
-| `radar_tracker/static/css/app.css` | design system com tema claro/escuro |
+| `radar_tracker/static/css/app.css` | design system com a identidade Galvitech (tokens do ERP de oficinas), tema claro/escuro |
 | `run.py` | ponto de entrada; `criar_servidor()` configura o waitress |
 | `scripts/simular_motoboy.py` | simulador do OwnTracks (`--tid`, `--todos`, `--token`, `--bateria`, `--parar-por`, `--cair-sinal`) |
 | `scripts/seed_demo.py` | clientes fictícios |
@@ -49,6 +49,13 @@ Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dado
 - O túnel só abre se `NGROK_DOMAIN` (no `.env`) **e** `OWNTRACKS_TOKEN` (no `.env.local` ou `.env`) estiverem definidos, existir `tools\ngrok.exe` (ou ngrok no PATH) e o ngrok tiver authtoken. Log em `data\ngrok.log`.
 - **Primeira execução num PC:** se falta o `OWNTRACKS_TOKEN`, o exe pergunta e grava em `.env.local`; se o `ngrok.yml` (`%LOCALAPPDATA%\ngrok\ngrok.yml`, `~\.ngrok2`, `~\.config\ngrok` ou `NGROK_AUTHTOKEN`) não tem authtoken, abre a página do token e roda `ngrok config add-authtoken`. Leitura mascarada com `*`; com stdin redirecionado usa `ReadLine` (dá para testar com `printf 'senha\n' | ./GalviTracks.exe`). Enter pula e abre só o painel.
 - **Recompilar depois de mudar o `.cs`**: no PowerShell, `& cmd.exe /c "C:\Users\radar\OneDrive\Desktop\GalviTracks\scripts\windows\launcher\compilar.bat"` (usa o `csc.exe` do .NET Framework 4; só C# 5, sem interpolação de string `$""`). `cmd //c compilar.bat` pelo Git Bash não funciona.
+
+## Identidade visual (25/11/2026)
+
+- O GalviTracks é um complemento do ERP de oficinas da Galvitech (repositório privado `Galvitech/sistema-mecanica`, `admin-frontend`: React + Tailwind + shadcn/ui) e deve ter a **mesma aparência**. Os tokens de `app.css` (seção 1) vêm do `src/index.css` do ERP: primary `#401F71` (264 57% 28%), primary-foreground `#E3D7F4`, secondary `#CEB7F0`, tertiary `#CD37BE`, border `#E5E5E5`, muted `#F5F5F5`, sidebar `#FAFAFA`, sidebar-accent `#F4F4F5`/`#7340BF`, radius 0.5rem, fonte Inter. O tema escuro usa os tokens do `Galvitech/galvi-controle` (fundo `#0E0B14`, primary `#B99AF0`), porque o escuro do ERP é o padrão do shadcn, sem a marca.
+- Esqueleto igual ao `internal-layout.tsx` do ERP: menu lateral (`.nav`, 16rem, recolhe para 3rem com `:root.nav-recolhida`, Ctrl+B; gaveta `:root.nav-aberta` no celular) + `.inset` com cabeçalho de 64 px (gatilho, separador, trilha). Ícones e botões de ícone em roxo, como o `svg, button { text-primary }` do ERP.
+- Logo: `radar_tracker/static/img/galvi.svg` (cópia do `galvi_rounded.svg` do ERP).
+- Conferência visual: Playwright com o Edge instalado (`channel="msedge"`) num venv temporário; o `--screenshot` do Edge headless trava por causa do SSE.
 
 ## Segurança (estado em 06/11/2026)
 

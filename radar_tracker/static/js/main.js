@@ -12,7 +12,7 @@ import { buscarResumo, renderResumo } from './resumo.js';
 import { abrirHistorico } from './historico.js';
 import { abrirReplay, fecharReplay, replayAberto } from './replay.js';
 import { iniciarTempoReal } from './tempo-real.js';
-import { $, digitando, el, gravarPref, lerPref, telaPequena } from './util.js';
+import { $, digitando, el, gravarPref, iniciais, lerPref, telaPequena } from './util.js';
 import { erro, fecharDialogoTopo, haDialogoAberto } from './ui.js';
 
 /* global L */
@@ -23,9 +23,10 @@ function aplicarTema(tema) {
   document.documentElement.dataset.tema = tema;
   aplicarTemaMapa(tema);
   const btn = $('#btn-tema');
-  btn.innerHTML = icone(tema === 'escuro' ? 'sol' : 'lua');
+  const rotulo = tema === 'escuro' ? 'Tema claro' : 'Tema escuro';
+  btn.replaceChildren(el('span', {}, { icone: tema === 'escuro' ? 'sol' : 'lua' }), el('span', { className: 'rotulo' }, rotulo));
   btn.title = tema === 'escuro' ? 'Usar tema claro' : 'Usar tema escuro';
-  document.querySelector('meta[name="theme-color"]').content = tema === 'escuro' ? '#0b1120' : '#ffffff';
+  document.querySelector('meta[name="theme-color"]').content = tema === 'escuro' ? '#0e0b14' : '#ffffff';
 }
 $('#btn-tema').addEventListener('click', () => {
   const novo = document.documentElement.dataset.tema === 'escuro' ? 'claro' : 'escuro';
@@ -35,15 +36,46 @@ $('#btn-tema').addEventListener('click', () => {
 mqEscuro.addEventListener('change', (e) => { if (!lerPref('tema')) aplicarTema(e.matches ? 'escuro' : 'claro'); });
 aplicarTema(document.documentElement.dataset.tema);
 
-// --- Topo ---
+// --- Menu lateral (mesmo comportamento do sidebar do ERP Galvitech) ---
+const raiz = document.documentElement;
+$('#nav-mapa').append(el('span', {}, { icone: 'pino' }), el('span', { className: 'rotulo' }, 'Mapa ao vivo'));
 $('#btn-historico').append(el('span', {}, { icone: 'historico' }), el('span', { className: 'rotulo' }, 'Histórico'));
-$('#btn-historico').addEventListener('click', abrirHistorico);
+$('#btn-historico').addEventListener('click', () => { fecharGaveta(); abrirHistorico(); });
 $('#btn-clientes').append(el('span', {}, { icone: 'usuarios' }), el('span', { className: 'rotulo' }, 'Clientes'));
-$('#btn-clientes').addEventListener('click', abrirGestao);
-$('.marca-logo').innerHTML = icone('moto');
+$('#btn-clientes').addEventListener('click', () => { fecharGaveta(); abrirGestao(); });
+$('#nav-mapa').addEventListener('click', () => fecharGaveta());
+$('#nav-avatar').textContent = iniciais(window.RADAR.empresa);
+
+const btnNav = $('#btn-nav');
+btnNav.innerHTML = icone('painel');
+function fecharGaveta() {
+  raiz.classList.remove('nav-aberta');
+  $('#nav-fundo').hidden = true;
+}
+function alternarMenu() {
+  if (telaPequena.matches) {
+    const abrir = !raiz.classList.contains('nav-aberta');
+    raiz.classList.toggle('nav-aberta', abrir);
+    $('#nav-fundo').hidden = !abrir;
+    return;
+  }
+  const recolher = !raiz.classList.contains('nav-recolhida');
+  raiz.classList.toggle('nav-recolhida', recolher);
+  gravarPref('nav', recolher ? 'recolhido' : 'aberto');
+  setTimeout(() => map.invalidateSize({ pan: false }), 220);
+}
+btnNav.addEventListener('click', alternarMenu);
+$('#nav-fundo').addEventListener('click', fecharGaveta);
+telaPequena.addEventListener('change', fecharGaveta);
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b' && !haDialogoAberto()) {
+    e.preventDefault();
+    alternarMenu();
+  }
+});
 
 const btnPainel = $('#btn-painel');
-btnPainel.innerHTML = icone('painel');
+btnPainel.innerHTML = icone('moto');
 function definirPainelRecolhido(v) {
   document.body.classList.toggle('painel-recolhido', v);
   btnPainel.setAttribute('aria-pressed', String(!v));
@@ -197,6 +229,7 @@ document.addEventListener('keydown', (e) => {
     if (haDialogoAberto()) { fecharDialogoTopo(); return; }
     if (emModoMira()) { sairModoMira(); return; }
     if (notifAberta()) { fecharNotif(); $('#btn-alertas').focus(); return; }
+    if (document.documentElement.classList.contains('nav-aberta')) { fecharGaveta(); return; }
     if (replayAberto()) { fecharReplay(); return; }
     if (digitando(e.target)) e.target.blur();
     return;

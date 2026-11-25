@@ -64,7 +64,7 @@ export async function cadastrarCliente(lat, lon, { nome = '', subtitulo } = {}) 
     campos: [
       { nome: 'nome', rotulo: 'Nome da oficina / cliente', valor: nome, obrigatorio: true, placeholder: 'Ex.: Auto Center Silva' },
       { nome: 'telefone', rotulo: 'Telefone', tipo: 'tel', placeholder: '(47) 99999-0000' },
-      { nome: 'cor', rotulo: 'Cor do pino', tipo: 'color', valor: '#2563eb' },
+      { nome: 'cor', rotulo: 'Cor do pino', tipo: 'color', valor: '#401f71' },
     ],
   });
   if (!v) return null;
@@ -142,7 +142,7 @@ export function sairModoMira() {
 
 async function aoClicarMira(e) {
   sairModoMira();
-  const marcaTemp = L.marker(e.latlng, { icon: pinoCliente('#2563eb'), interactive: false }).addTo(map);
+  const marcaTemp = L.marker(e.latlng, { icon: pinoCliente('#401f71'), interactive: false }).addTo(map);
   await cadastrarCliente(e.latlng.lat, e.latlng.lng);
   map.removeLayer(marcaTemp);
 }

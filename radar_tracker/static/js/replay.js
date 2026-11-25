@@ -111,7 +111,7 @@ async function carregar() {
   const ini = pontos[0];
   const fim = pontos[pontos.length - 1];
   L.circleMarker([ini.lat, ini.lon], { renderer: canvas, radius: 6, color: '#fff', weight: 2, fillColor: '#16a34a', fillOpacity: 1 }).bindTooltip('Início').addTo(camadaReplay);
-  L.circleMarker([fim.lat, fim.lon], { renderer: canvas, radius: 6, color: '#fff', weight: 2, fillColor: '#0f172a', fillOpacity: 1 }).bindTooltip('Fim').addTo(camadaReplay);
+  L.circleMarker([fim.lat, fim.lon], { renderer: canvas, radius: 6, color: '#fff', weight: 2, fillColor: '#401f71', fillOpacity: 1 }).bindTooltip('Fim').addTo(camadaReplay);
 
   const m = app.estado[id];
   marcador = L.marker([ini.lat, ini.lon], {
