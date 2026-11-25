@@ -4,6 +4,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/). 
 
 ## [Não lançado]
 
+### Identidade visual Galvitech
+- Painel com a mesma aparência do ERP de oficinas da Galvitech (`sistema-mecanica`): tokens de cor do ERP (roxo `#401F71`, lavanda, magenta, cinzas neutros), Inter, raio de 8 px, sombras e componentes no estilo shadcn/ui (botões, campos, badges de status, tabelas, diálogos, toasts).
+- Novo esqueleto de tela: menu lateral com os grupos Rastreamento (Mapa ao vivo, Histórico, Clientes) e Preferências (tema), usuário no rodapé, recolhível para ícones (Ctrl+B, preferência lembrada) e gaveta no celular; cabeçalho de 64 px com o botão do menu e a trilha de navegação.
+- Logo e favicon da Galvi; ícones em roxo; tema escuro no roxo da marca (tokens do `galvi-controle`); replay em laranja (série 2 dos gráficos do ERP); pino da loja em roxo.
+
 ### Primeira execução em outro PC
 - Banco da loja (`data/radar.db`), `.env`, `config/motoboys.json` e `tools/ngrok.exe` passam a ser versionados: um clone em qualquer PC abre com os dados.
 - Senhas deste PC em `.env.local` (fora do git), com prioridade sobre o `.env`; lido pelo servidor, pelo `GalviTracks.exe` e pelo `tunel_ngrok.bat`.
