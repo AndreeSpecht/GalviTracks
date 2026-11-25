@@ -174,7 +174,7 @@ const situacao = [
   bullet([t('Novo painel (semana 11): ', { bold: true }), t('design system com tema claro/escuro, marcadores que deslizam e giram pela direção, central de alertas, histórico com filtros e replay com velocidades.')]),
   bullet([t('Implantação (semana 12): ', { bold: true }), t('GalviTracks.exe instala o ambiente na primeira vez e abre túnel, servidor e painel com um clique; fechar a janela encerra tudo.')]),
   bullet([t('Segurança e login (semana 13): ', { bold: true }), t('pela internet só o OwnTracks, com token; login de operador com perfis gestor/operador, primeiro acesso e gestão de usuários; painel com a identidade visual do ERP de oficinas da Galvitech.')]),
-  bullet([t('Qualidade: ', { bold: true }), t('145 testes automatizados e integração contínua em Windows e Ubuntu (Python 3.10, 3.12 e 3.13).')]),
+  bullet([t('Qualidade: ', { bold: true }), t('152 testes automatizados e integração contínua em Windows e Ubuntu (Python 3.10, 3.12 e 3.13).')]),
   bullet([t('Portabilidade: ', { bold: true }), t('GalviTracks.exe (Windows) e instalar.sh/iniciar.sh (Linux/macOS), simulador de motoboy e dados de demonstração.')]),
   bullet([t('Documentação: ', { bold: true }), t('README, requisitos, arquitetura, API, banco de dados, instalação e histórico de desenvolvimento em docs/.')]),
   h2('Como executar'),

@@ -72,6 +72,7 @@ Plataformas como Vuupt, Loggi e Foody Delivery atendem parte disso, mas cobram m
 | **Rotas otimizadas** | Monta a rota por cliente cadastrado, endereço ou clique no mapa. Ordena pelo vizinho mais próximo e calcula trajeto e tempo pelo OSRM, com estimativa offline se o serviço cair. |
 | **Cadastro de clientes** | Clientes georreferenciados, com telefone e cor do pino, cadastrados no próprio sistema. |
 | **Histórico de viagens** | Cada saída exige o nº da nota e é registrada com motoboy, horários e destinos. Filtro por período e exportação Excel. |
+| **Indicadores por motoboy** | No período escolhido: viagens, destinos por viagem, tempo médio e total em rota e km rodados pela trilha GPS. Também saem numa aba do Excel. |
 | **Replay de trilha** | Reproduz o percurso de um motoboy em um dia, com velocidades 1×, 4× e 16×. |
 | **Alertas** | Avisa quando o motoboy fica sem sinal, parado mais de 10 min fora de um cliente ou com bateria baixa. |
 | **Login e perfis** | Gestor e operador; o gestor cria e remove usuários pelo próprio painel. |
@@ -86,7 +87,7 @@ Outros detalhes do painel: tema claro e escuro, layout para celular, atalhos de 
 - **Login:** senhas com hash scrypt, sessão assinada, limite de 5 tentativas em 5 min por IP e recusa de requisições de outros sites.
 - **Resiliência:** a rota em andamento sobrevive a um reinício do servidor (sessão gravada de forma atômica), e o cálculo de rotas funciona offline.
 - **Instalação em um clique:** o `GalviTracks.exe` (C#) cria o ambiente Python, abre o túnel, sobe o servidor e o painel; fechar a janela encerra tudo.
-- **Qualidade:** 145 testes automatizados com GitHub Actions em Windows e Ubuntu (Python 3.10, 3.12 e 3.13).
+- **Qualidade:** 152 testes automatizados com GitHub Actions em Windows e Ubuntu (Python 3.10, 3.12 e 3.13).
 
 ## Arquitetura
 
@@ -123,7 +124,7 @@ Detalhes, diagramas de estado e sequência e as decisões de projeto estão em [
 | Relatórios | **openpyxl** | Exportação do histórico em Excel |
 | Acesso dos celulares | **ngrok** | Túnel HTTPS até o servidor da loja |
 | Instalador | **C# (.NET Framework)** | `GalviTracks.exe` |
-| Qualidade | **pytest · GitHub Actions** | 145 testes em Windows e Ubuntu |
+| Qualidade | **pytest · GitHub Actions** | 152 testes em Windows e Ubuntu |
 
 ## Início rápido
 

@@ -152,9 +152,12 @@ Sem `simplificar=1`, retorna todos os pontos como antes, acrescentando `curso` (
 | Método | Rota | Descrição |
 |--------|------|-----------|
 | GET | `/api/get_historico[?inicio=AAAA-MM-DD&fim=AAAA-MM-DD]` | Viagens (mais recentes primeiro). |
-| GET | `/baixar_excel[?inicio=...&fim=...]` | Planilha `.xlsx` com o mesmo filtro. |
+| GET | `/api/indicadores[?inicio=...&fim=...]` | Indicadores por motoboy no período e o total da frota. |
+| GET | `/baixar_excel[?inicio=...&fim=...]` | Planilha `.xlsx` com o mesmo filtro: aba *Histórico* (uma linha por viagem) e aba *Indicadores*. |
 
 O histórico inclui também `inicio_ts`, `fim_ts` (Unix, segundos) e `duracao_min`. A data da viagem é a data da saída mesmo quando termina após a meia-noite. Registros antigos são migrados a partir dos horários existentes; quando a chegada é menor que a saída, assume o dia seguinte. Textos no Excel iniciados por `=`, `+`, `-` ou `@` recebem apóstrofo para impedir interpretação como fórmula. Uma falha SQL ao finalizar mantém a rota em andamento para permitir nova tentativa.
+
+`/api/indicadores` devolve `{"motoboys": [...], "total": {...}}`; cada item tem `motoboy`, `viagens`, `destinos`, `destinos_por_viagem`, `tempo_medio_min` e `tempo_total_min` (da saída à chegada), `km`, `km_por_viagem` e `viagens_com_km`. O km é a soma da trilha GPS gravada entre a saída e a chegada de cada viagem; viagens sem pelo menos dois pontos (celular sem enviar posição, registros antigos ou trilha apagada pela retenção de 90 dias) ficam fora do km, e `km` vem `null` quando nenhuma viagem do motoboy tem trilha. Os motoboys vêm ordenados pelo número de viagens.
 
 ## Verificação real do SSE
 

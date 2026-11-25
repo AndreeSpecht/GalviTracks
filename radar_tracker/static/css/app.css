@@ -696,6 +696,8 @@ body.modo-mira #mapa, body.modo-mira #mapa .leaflet-interactive { cursor: crossh
 /* 7. DIÁLOGOS, TOASTS E TABELAS --------------------------------------- */
 .dlg-fundo {
   position: fixed; inset: 0; z-index: 3000; display: grid; place-items: center; padding: 16px;
+  /* coluna limitada à tela: tabelas largas rolam dentro do diálogo em vez de alargá-lo */
+  grid-template-columns: minmax(0, 1fr);
   background: rgb(0 0 0 / .8);
   opacity: 0; transition: opacity var(--t-media);
 }
@@ -717,6 +719,7 @@ body.modo-mira #mapa, body.modo-mira #mapa .leaflet-interactive { cursor: crossh
 .dlg-titulos h2 { font-size: 18px; font-weight: 600; letter-spacing: -.01em; line-height: 1.2; }
 .dlg-titulos p { font-size: 14px; color: var(--txt-3); margin-top: 4px; }
 .dlg-corpo { padding: 12px 24px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.dlg-corpo > * { min-width: 0; }
 .dlg-texto { color: var(--txt-2); font-size: 14.5px; }
 .dlg-rodape { display: flex; justify-content: flex-end; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--borda); background: var(--sup); border-radius: 0 0 var(--r-3) var(--r-3); }
 
@@ -753,6 +756,19 @@ body.modo-mira #mapa, body.modo-mira #mapa .leaflet-interactive { cursor: crossh
 .tag-nota { display: inline-block; padding: 2px 10px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--pri) 25%, transparent); background: color-mix(in srgb, var(--pri) 10%, transparent); color: var(--pri); font-weight: 500; font-variant-numeric: tabular-nums; font-size: 12.5px; }
 .cel-cliente { display: inline-flex; align-items: center; gap: 10px; font-weight: 500; }
 .linha-skeleton td { background: transparent !important; }
+/* Indicadores por motoboy (histórico) */
+.tabela .num { text-align: right; font-variant-numeric: tabular-nums; }
+.tabela th.num { text-align: right; }
+.tabela tfoot th {
+  position: sticky; bottom: 0; height: 48px; padding: 0 16px; background: var(--sup);
+  border-top: 1px solid var(--borda); color: var(--txt); font-weight: 600; font-size: 14px;
+}
+.tabela tfoot th:first-child { text-align: left; }
+.ind-viagens { display: inline-flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.ind-viagens > span:first-child { min-width: 3ch; text-align: right; }
+.ind-barra { display: block; width: 72px; height: 6px; border-radius: 999px; background: var(--sup-3); overflow: hidden; }
+.ind-barra i { display: block; height: 100%; border-radius: inherit; background: var(--pri); }
+.ind-nota { margin: 0; font-size: 13px; }
 
 .toasts {
   position: fixed; right: 16px; bottom: 16px; z-index: 4000; width: min(380px, calc(100vw - 32px));
@@ -890,7 +906,7 @@ body.pagina-login { overflow: auto; background: var(--sup-3); }
   .dlg-rodape { border-radius: 0; padding-bottom: calc(14px + env(safe-area-inset-bottom)); }
   .dlg-rodape .btn { flex: 1; height: 44px; }
   .datas { margin-left: 0; width: 100%; }
-  .datas .inp { flex: 1; width: auto; }
+  .datas .inp { flex: 1; width: auto; min-width: 0; }
   .totais strong { font-size: 17px; }
   .inp { height: 44px; font-size: 16px; }
 }
