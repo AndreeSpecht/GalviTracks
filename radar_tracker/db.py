@@ -42,6 +42,15 @@ CREATE TABLE IF NOT EXISTS historico (
     destinos TEXT,
     numero_nota TEXT DEFAULT ''
 );
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    nome TEXT NOT NULL,
+    senha_hash TEXT NOT NULL,
+    perfil TEXT NOT NULL DEFAULT 'operador',
+    ativo INTEGER NOT NULL DEFAULT 1,
+    criado_em INTEGER
+);
 """
 
 # Colunas acrescentadas após a primeira versão do banco (protótipo V79)
@@ -274,3 +283,55 @@ class Banco:
         sql += " ORDER BY id DESC"
         with self.conexao() as conn:
             return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+    # --- Usuários do painel (login de operador) ---
+    _CAMPOS_USUARIO = "id, usuario, nome, perfil, ativo, criado_em"
+
+    def contar_usuarios(self, perfil=None):
+        """Quantidade de usuários ativos (opcionalmente só de um perfil)."""
+        sql, params = "SELECT COUNT(*) FROM usuarios WHERE ativo = 1", []
+        if perfil:
+            sql += " AND perfil = ?"
+            params.append(perfil)
+        with self.conexao() as conn:
+            return conn.execute(sql, params).fetchone()[0]
+
+    def criar_usuario(self, usuario, nome, senha_hash, perfil):
+        """Cria o usuário e devolve o id. Lança ValueError se o login já existe."""
+        try:
+            with self.conexao() as conn:
+                cur = conn.execute(
+                    "INSERT INTO usuarios (usuario, nome, senha_hash, perfil, ativo, criado_em) VALUES (?, ?, ?, ?, 1, ?)",
+                    (usuario, nome, senha_hash, perfil, int(time.time())))
+                return cur.lastrowid
+        except sqlite3.IntegrityError as e:
+            raise ValueError("Já existe um usuário com esse login.") from e
+
+    def obter_usuario(self, usuario_id):
+        with self.conexao() as conn:
+            r = conn.execute(f"SELECT {self._CAMPOS_USUARIO} FROM usuarios WHERE id = ?", (usuario_id,)).fetchone()
+        return dict(r) if r else None
+
+    def usuario_para_login(self, usuario):
+        """Usuário (com o hash da senha) pelo login, sem diferenciar maiúsculas."""
+        with self.conexao() as conn:
+            r = conn.execute(f"SELECT {self._CAMPOS_USUARIO}, senha_hash FROM usuarios WHERE usuario = ? COLLATE NOCASE",
+                             (usuario,)).fetchone()
+        return dict(r) if r else None
+
+    def listar_usuarios(self):
+        with self.conexao() as conn:
+            rows = conn.execute(f"SELECT {self._CAMPOS_USUARIO} FROM usuarios WHERE ativo = 1 "
+                                "ORDER BY nome COLLATE NOCASE").fetchall()
+        return [dict(r) for r in rows]
+
+    def definir_senha(self, usuario_id, senha_hash):
+        with self.conexao() as conn:
+            return conn.execute("UPDATE usuarios SET senha_hash = ? WHERE id = ? AND ativo = 1",
+                                (senha_hash, usuario_id)).rowcount > 0
+
+    def desativar_usuario(self, usuario_id):
+        """Remove o acesso mantendo o registro (o login fica livre para reuso)."""
+        with self.conexao() as conn:
+            return conn.execute("UPDATE usuarios SET ativo = 0, usuario = usuario || '#removido-' || id "
+                                "WHERE id = ? AND ativo = 1", (usuario_id,)).rowcount > 0

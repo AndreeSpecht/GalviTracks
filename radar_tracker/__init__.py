@@ -51,6 +51,9 @@ def create_app(config=None, motoboys=None):
                                "streams": Streams(cfg.STREAM_MAX), "fechar": fechar}
 
     from .api import bp
+    from .auth import bp as bp_auth, configurar as configurar_login
 
-    app.register_blueprint(bp)
+    configurar_login(app, cfg)
+    app.register_blueprint(bp)  # primeiro: bloqueio do acesso externo
+    app.register_blueprint(bp_auth)  # depois: login obrigatório
     return app

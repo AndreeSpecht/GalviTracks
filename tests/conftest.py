@@ -1,7 +1,8 @@
 import pytest
 import requests
+from werkzeug.security import generate_password_hash
 
-from radar_tracker import create_app
+from radar_tracker import auth, create_app
 from radar_tracker.config import Config
 from radar_tracker.frota import Frota
 
@@ -19,6 +20,8 @@ def cfg(tmp_path):
         ARQUIVO_SESSAO = tmp_path / "sessao.json"
         OWNTRACKS_TOKEN = ""
         NGROK_DOMAIN = ""
+        SECRET_KEY = "chave-de-teste"
+        ACESSO_PAINEL_INTERNET = False
 
     return ConfigTeste
 
@@ -56,6 +59,37 @@ def fechar_frotas(monkeypatch):
         frota.fechar()
 
 
+# Hash barato nos testes (o scrypt padrão é lento de propósito)
+SENHA_TESTE = "senha-teste"
+HASH_TESTE = generate_password_hash(SENHA_TESTE, method="pbkdf2:sha256:1")
+
+
+def criar_usuario(app, usuario="gestor", perfil="gestor", nome=None):
+    return app.extensions["radar"]["banco"].criar_usuario(usuario, nome or usuario.title(), HASH_TESTE, perfil)
+
+
+def entrar(cliente, uid):
+    with cliente.session_transaction() as sessao:
+        sessao["uid"] = uid
+        sessao.permanent = True
+
+
+@pytest.fixture(autouse=True)
+def zerar_tentativas():
+    auth._tentativas.clear()
+    yield
+    auth._tentativas.clear()
+
+
+@pytest.fixture
+def anonimo(app):
+    """Cliente sem login."""
+    return app.test_client()
+
+
 @pytest.fixture
 def client(app):
-    return app.test_client()
+    """Cliente já logado como gestor (a maioria dos testes trata da API, não do login)."""
+    cliente = app.test_client()
+    entrar(cliente, criar_usuario(app))
+    return cliente

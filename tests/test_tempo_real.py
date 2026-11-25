@@ -1,6 +1,7 @@
 import json
 import threading
 import time
+import types
 
 from radar_tracker import alertas
 from radar_tracker.stream import Streams, eventos
@@ -88,12 +89,15 @@ def test_stream_recebe_rota_status_e_contato_com_gps_descartado(app, client):
 
 
 def test_online_expira_sem_novo_gps(app, client, monkeypatch):
+    # Relógio falso só no módulo de alertas: trocar o time.time global também
+    # venceria a assinatura do cookie de sessão do teste.
+    relogio = types.SimpleNamespace(time=lambda: 1001)
+    monkeypatch.setattr("radar_tracker.alertas.time", relogio)
     f = app.extensions["radar"]["frota"]
     f.registrar_contato(0, agora=1000)
-    monkeypatch.setattr("radar_tracker.alertas.time.time", lambda: 1001)
     online = client.get("/api/estado").json["0"]
     assert online["online"] is True
-    monkeypatch.setattr("radar_tracker.alertas.time.time", lambda: 1180)
+    relogio.time = lambda: 1180
     offline = client.get("/api/estado").json["0"]
     assert offline["online"] is False
     assert offline["versao"] > online["versao"]

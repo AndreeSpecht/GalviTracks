@@ -8,7 +8,7 @@ import math
 import time
 from datetime import datetime, timedelta
 
-from flask import Blueprint, Response, abort, current_app, jsonify, render_template, request, send_file
+from flask import Blueprint, Response, abort, current_app, g, jsonify, render_template, request, send_file
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
 
@@ -94,7 +94,8 @@ def _requisicao_externa():
 def _proteger_acesso_externo():
     if not _requisicao_externa():
         return None
-    if request.path not in ROTAS_EXTERNAS:
+    # Na nuvem o painel abre pela internet; o login (auth.py) continua obrigatório.
+    if request.path not in ROTAS_EXTERNAS and not _cfg().ACESSO_PAINEL_INTERNET:
         log.warning("Acesso externo bloqueado: %s %s", request.method, request.path)
         if request.path.startswith("/api/"):
             return jsonify({"ok": 0, "erro": "Disponível somente na rede da loja."}), 403
@@ -110,7 +111,9 @@ def _proteger_acesso_externo():
 @bp.route("/")
 def index():
     cfg = _cfg()
-    return render_template("index.html", empresa=cfg.NOME_EMPRESA, base_lat=cfg.BASE_LAT, base_lon=cfg.BASE_LON)
+    usuario = g.get("usuario") or {}
+    return render_template("index.html", empresa=cfg.NOME_EMPRESA, base_lat=cfg.BASE_LAT, base_lon=cfg.BASE_LON,
+                           usuario={k: usuario.get(k) for k in ("id", "nome", "usuario", "perfil")})
 
 
 @bp.route("/api/health")
