@@ -4,6 +4,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/). 
 
 ## [Não lançado]
 
+### Servidor na nuvem
+- `Dockerfile` (x86 e ARM) e `compose.yml` com o app, o **Caddy** (HTTPS automático pelo Let's Encrypt, SSE sem buffer) e um serviço de **backup diário** às 3h (`scripts/backup_banco.py`, últimos 14 dias).
+- `PROXIES_CONFIAVEIS`: o limite de tentativas de login usa o IP real informado pelo proxy reverso, só quando a conexão vem de um proxy confiável.
+- `deploy/preparar_vm.sh` (Docker, firewall da Oracle, swap e fuso) e o passo a passo em `docs/nuvem.md`, do domínio aos celulares.
+
 ### Indicadores por motoboy (#37, #39)
 - Histórico ganhou a visão **Por motoboy**: viagens, destinos por viagem, tempo médio e total em rota e km rodados no período, com linha de total da frota.
 - Km calculado pela trilha GPS gravada entre a saída e a chegada de cada viagem; viagens sem trilha não entram no km, e o painel informa quantas tinham.

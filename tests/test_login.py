@@ -233,3 +233,44 @@ def test_script_cria_e_redefine_usuario(tmp_path):
     listagem = subprocess.run([sys.executable, str(RAIZ / "scripts" / "criar_usuario.py"), "--listar"],
                               capture_output=True, text=True, env=env, timeout=60)
     assert "andre" in listagem.stdout and "gestor" in listagem.stdout
+
+
+# --- Atrás de um proxy reverso (servidor na nuvem) ---
+@pytest.fixture
+def nuvem(app, monkeypatch):
+    cfg = app.extensions["radar"]["config"]
+    monkeypatch.setattr(cfg, "ACESSO_PAINEL_INTERNET", True)
+    monkeypatch.setattr(cfg, "PROXIES_CONFIAVEIS", "127.0.0.1,::1,172.16.0.0/12")
+    criar_usuario(app)
+    return app
+
+
+def _pelo_proxy(cliente, ip_real, senha):
+    return cliente.post("/login", data={"usuario": "gestor", "senha": senha},
+                        headers={"X-Forwarded-For": ip_real}, environ_base={"REMOTE_ADDR": "172.18.0.3"})
+
+
+def test_proxy_confiavel_separa_as_tentativas_por_ip_real(nuvem):
+    atacante, loja = nuvem.test_client(), nuvem.test_client()
+    for _ in range(auth.TENTATIVAS_MAX):
+        assert _pelo_proxy(atacante, "8.8.8.8", "errada").status_code == 401
+    assert _pelo_proxy(atacante, "8.8.8.8", SENHA_TESTE).status_code == 429
+    # outro IP real atrás do mesmo proxy não é bloqueado pelo atacante
+    assert _pelo_proxy(loja, "8.8.4.4", SENHA_TESTE).status_code == 302
+
+
+def test_proxy_nao_listado_nao_e_confiavel(nuvem, monkeypatch):
+    monkeypatch.setattr(nuvem.extensions["radar"]["config"], "PROXIES_CONFIAVEIS", "127.0.0.1")
+    with nuvem.test_request_context("/login", headers={"X-Forwarded-For": "8.8.8.8"},
+                                    environ_base={"REMOTE_ADDR": "172.18.0.3"}):
+        assert auth._ip() == "172.18.0.3"
+    with nuvem.test_request_context("/login", headers={"X-Forwarded-For": "8.8.8.8"},
+                                    environ_base={"REMOTE_ADDR": "127.0.0.1"}):
+        assert auth._ip() == "8.8.8.8"
+
+
+def test_proxies_confiaveis_invalidos_sao_ignorados(nuvem, monkeypatch):
+    monkeypatch.setattr(nuvem.extensions["radar"]["config"], "PROXIES_CONFIAVEIS", "lixo, ,172.16.0.0/12")
+    with nuvem.test_request_context("/login", headers={"X-Forwarded-For": "1.2.3.4, 8.8.8.8"},
+                                    environ_base={"REMOTE_ADDR": "172.18.0.3"}):
+        assert auth._ip() == "8.8.8.8"  # o último IP é o que o proxy acrescentou

@@ -90,6 +90,9 @@ class Config:
     # 0 = painel só na rede da loja (pela internet, só o OwnTracks). 1 = painel também pela
     # internet, sempre com login (servidor na nuvem).
     ACESSO_PAINEL_INTERNET = _env("ACESSO_PAINEL_INTERNET", "0") == "1"
+    # Endereços (ou faixas CIDR) do proxy reverso cujo X-Forwarded-For é confiável para saber o
+    # IP real do cliente (limite de tentativas de login). Na nuvem, a rede interna do Docker.
+    PROXIES_CONFIAVEIS = _env("PROXIES_CONFIAVEIS", "127.0.0.1,::1")
     GPS_PRECISAO_MAX_M = _env_float("GPS_PRECISAO_MAX_M", "100")
     GPS_VELOCIDADE_MAX_KMH = _env_float("GPS_VELOCIDADE_MAX_KMH", "150")
     GPS_VELOCIDADE_ALPHA = _env_float("GPS_VELOCIDADE_ALPHA", "0.35")
