@@ -6,7 +6,9 @@ Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08
 
 > As entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026.
 >
-> As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026. A confirmação de entrega por parada saiu do escopo (trabalho futuro) e o login de operador passou para a semana 13.
+> As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026. A confirmação de entrega por parada saiu do escopo (trabalho futuro) e o login de operador passou para a semana 13, entregue em 25/11/2026 junto com a identidade visual Galvitech.
+>
+> A homologação e a avaliação (semanas 14 a 16) foram replanejadas para a reta final, a partir de 26/11/2026. Protocolo, planilha de medições e questionário SUS: [docs/avaliacao](avaliacao/).
 
 ## Marcos
 
@@ -14,7 +16,7 @@ Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08
 |-------|------|-----------|--------|
 | M1 | 28/08/2026 | Requisitos e projeto aprovados | ✅ Concluído |
 | M2 | 25/09/2026 | v0.8.0: sistema funcional, testado e documentado | ✅ Concluído |
-| M3 | 30/10/2026 | v0.9.0: rastreador homologado na Radar Auto Peças | 🔜 Planejado |
+| M3 | 30/10/2026 | v0.9.0: rastreador homologado na Radar Auto Peças (replanejado para a semana 14) | 🔄 Em andamento |
 | M4 | 20/11/2026 | Avaliação em ambiente real concluída (cronometragem + SUS) | 🔜 Planejado |
 | M5 | 04/12/2026 | v1.0.0 e TCC prontos para a defesa | 🔜 Planejado |
 
@@ -34,8 +36,8 @@ Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08
 | 10 | 09/10/2026 | Tempo real | Backend em tempo real: estado da frota por SSE, resumo do dia e robustez do GPS. | radar_tracker/api.py, frota.py, docs/api.md | ✅ Concluída |
 | 11 | 16/10/2026 | Painel | Novo painel: mapa fluido, indicadores do dia e replay aprimorado. | radar_tracker/static/js/, static/css/app.css | ✅ Concluída |
 | 12 | 23/10/2026 | Implantação | GalviTracks.exe: instalação, túnel, servidor e painel com um clique. | GalviTracks.exe, scripts/windows/launcher/ | ✅ Concluída |
-| 13 | 30/10/2026 | Segurança e testes | Segurança do acesso externo, login de operador e homologação na Radar Auto Peças. | Release v0.9.0 | 🔜 Planejada |
-| 14 | 06/11/2026 | Avaliação | Cronometragem de base (processo atual) e treinamento da equipe. | Planilha de medições (baseline) | 🔜 Planejada |
+| 13 | 30/10/2026 | Segurança | Segurança do acesso externo, login de operador com perfis e identidade visual Galvitech. | radar_tracker/auth.py, issues #40–#42 fechadas | ✅ Concluída |
+| 14 | 06/11/2026 | Avaliação | Homologação na loja, treinamento da equipe e cronometragem de base (processo atual). | Planilha de medições (base) + release v0.9.0 | 🔄 Em andamento |
 | 15 | 13/11/2026 | Avaliação | Piloto em ambiente real com cronometragem usando o sistema. | Planilha de medições (piloto) | 🔜 Planejada |
 | 16 | 20/11/2026 | Avaliação | Aplicação do questionário SUS e ajustes finais de usabilidade. | Resultado SUS | 🔜 Planejada |
 | 17 | 27/11/2026 | TCC | Análise dos resultados e redação do artigo do TCC. | Artigo (versão para revisão) | 🔜 Planejada |
@@ -163,25 +165,25 @@ Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08
 
 **Evidência:** GalviTracks.exe, scripts/windows/launcher/ · **Status:** Concluída
 
-### Semana 13 · 30/10/2026 · Segurança e testes
+### Semana 13 · 30/10/2026 · Segurança
 
-**Entrega:** Segurança do acesso externo, login de operador e homologação na Radar Auto Peças.
+**Entrega:** Segurança do acesso externo, login de operador com perfis e identidade visual Galvitech.
 
-- Túnel restrito ao endpoint do OwnTracks, com token obrigatório
-- Login de operador no painel
-- Testes de campo, homologação com o operador de expedição e versão v0.9.0
+- Túnel restrito ao endpoint do OwnTracks, com token obrigatório (validado com ngrok real)
+- Login de operador com perfis gestor/operador, primeiro acesso e gestão de usuários
+- Painel com a identidade visual do ERP de oficinas da Galvitech
 
-**Evidência:** Release v0.9.0 · **Status:** Planejada
+**Evidência:** radar_tracker/auth.py, issues #40–#42 fechadas · **Status:** Concluída
 
 ### Semana 14 · 06/11/2026 · Avaliação
 
-**Entrega:** Cronometragem de base (processo atual) e treinamento da equipe.
+**Entrega:** Homologação na loja, treinamento da equipe e cronometragem de base (processo atual).
 
-- Medir o tempo de planejamento de rotas sem o sistema
-- Treinamento dos operadores e motoboys
-- Configuração do OwnTracks nos celulares
+- Homologação com o operador de expedição e versão v0.9.0
+- Treinamento dos operadores e motoboys; OwnTracks nos celulares
+- Medir o tempo de planejamento de rotas sem o sistema (protocolo em docs/avaliacao)
 
-**Evidência:** Planilha de medições (baseline) · **Status:** Planejada
+**Evidência:** Planilha de medições (base) + release v0.9.0 · **Status:** Em andamento
 
 ### Semana 15 · 13/11/2026 · Avaliação
 

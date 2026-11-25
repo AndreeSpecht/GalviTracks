@@ -129,7 +129,7 @@ const corpo = [
   bullet('a entrega foi demonstrada à professora, quando aplicável.'),
   p([t('Repositório: ', { bold: true }), new ExternalHyperlink({ link: REPO, children: [t(REPO, { style: 'Hyperlink' })] })], { align: AlignmentType.LEFT }),
   p('As semanas 9 a 18 estão cadastradas como milestones no GitHub, com data de vencimento na sexta-feira correspondente, e as tarefas de cada semana aparecem como issues. Assim, o progresso pode ser acompanhado diretamente no repositório.'),
-  p([t('Observação: ', { bold: true }), t('as entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026. As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026; a confirmação de entrega por parada saiu do escopo e o login de operador passou para a semana 13. As datas desta tabela e a coluna Status podem ser editadas neste documento conforme o calendário acadêmico.', { italics: true })]),
+  p([t('Observação: ', { bold: true }), t('as entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026. As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026; a confirmação de entrega por parada saiu do escopo e o login de operador passou para a semana 13, entregue em 25/11/2026 junto com a identidade visual Galvitech. A homologação e a avaliação (semanas 14 a 16) foram replanejadas para a reta final, a partir de 26/11/2026, com o protocolo e a planilha em docs/avaliacao. As datas desta tabela e a coluna Status podem ser editadas neste documento conforme o calendário acadêmico.', { italics: true })]),
 
   h1('3. Marcos do projeto'),
   tabela([900, 1500, 5126, 1500], ['Marco', 'Data', 'Descrição', 'Status'], marcos, { centro: [0, 1, 3], fundoLinha: fundoStatus }),
@@ -174,7 +174,8 @@ const situacao = [
   bullet([t('Tempo real (semana 10): ', { bold: true }), t('estado da frota por Server-Sent Events (/api/stream), com volta automática ao polling; resumo do dia em /api/resumo; SQLite em WAL e gravação agrupada da sessão.')]),
   bullet([t('Novo painel (semana 11): ', { bold: true }), t('design system com tema claro/escuro, marcadores que deslizam e giram pela direção, central de alertas, histórico com filtros e replay com velocidades.')]),
   bullet([t('Implantação (semana 12): ', { bold: true }), t('GalviTracks.exe instala o ambiente na primeira vez e abre túnel, servidor e painel com um clique; fechar a janela encerra tudo.')]),
-  bullet([t('Qualidade: ', { bold: true }), t('83 testes automatizados e integração contínua em Windows e Ubuntu (Python 3.10, 3.12 e 3.13).')]),
+  bullet([t('Segurança e login (semana 13): ', { bold: true }), t('pela internet só o OwnTracks, com token; login de operador com perfis gestor/operador, primeiro acesso e gestão de usuários; painel com a identidade visual do ERP de oficinas da Galvitech.')]),
+  bullet([t('Qualidade: ', { bold: true }), t('145 testes automatizados e integração contínua em Windows e Ubuntu (Python 3.10, 3.12 e 3.13).')]),
   bullet([t('Portabilidade: ', { bold: true }), t('GalviTracks.exe (Windows) e instalar.sh/iniciar.sh (Linux/macOS), simulador de motoboy e dados de demonstração.')]),
   bullet([t('Documentação: ', { bold: true }), t('README, requisitos, arquitetura, API, banco de dados, instalação e histórico de desenvolvimento em docs/.')]),
   h2('Como executar'),
@@ -255,11 +256,12 @@ if (process.argv[3]) {
   md.push('# Cronograma de entregas', '');
   md.push('> Versão editável em Word: [`Cronograma_Entregas_TCC.docx`](Cronograma_Entregas_TCC.docx)', '');
   md.push('Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08/2026 a 04/12/2026. Uma entrega está concluída quando está no branch `main`, com testes passando no CI e documentação atualizada. As semanas 9 a 18 estão cadastradas como **milestones** no GitHub, com as tarefas em **issues**.', '');
-  md.push('> As entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026.', '>', '> As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026. A confirmação de entrega por parada saiu do escopo (trabalho futuro) e o login de operador passou para a semana 13.', '');
+  md.push('> As entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026.', '>', '> As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026. A confirmação de entrega por parada saiu do escopo (trabalho futuro) e o login de operador passou para a semana 13, entregue em 25/11/2026 junto com a identidade visual Galvitech.', '>', '> A homologação e a avaliação (semanas 14 a 16) foram replanejadas para a reta final, a partir de 26/11/2026. Protocolo, planilha de medições e questionário SUS: [docs/avaliacao](avaliacao/).', '');
   md.push('## Marcos', '', '| Marco | Data | Descrição | Status |', '|-------|------|-----------|--------|');
-  marcos.forEach((m) => md.push(`| ${m[0]} | ${m[1]} | ${m[2]} | ${m[3] === 'Concluído' ? '✅ ' : '🔜 '}${m[3]} |`));
+  const emoji = (st) => (st.startsWith('Conclu') ? '✅' : st === 'Em andamento' ? '🔄' : '🔜');
+  marcos.forEach((m) => md.push(`| ${m[0]} | ${m[1]} | ${m[2]} | ${emoji(m[3])} ${m[3]} |`));
   md.push('', '## Entregas semanais', '', '| Sem. | Sexta-feira | Fase | Entrega | Evidência | Status |', '|:----:|:-----------:|------|---------|-----------|:------:|');
-  semanas.forEach((s) => md.push(`| ${s.n} | ${s.data} | ${s.fase} | ${s.entrega} | ${s.evidencia} | ${s.status === 'Concluída' ? '✅' : '🔜'} ${s.status} |`));
+  semanas.forEach((s) => md.push(`| ${s.n} | ${s.data} | ${s.fase} | ${s.entrega} | ${s.evidencia} | ${emoji(s.status)} ${s.status} |`));
   md.push('', '## Detalhamento', '');
   semanas.forEach((s) => {
     md.push(`### Semana ${String(s.n).padStart(2, '0')} · ${s.data} · ${s.fase}`, '', `**Entrega:** ${s.entrega}`, '');
