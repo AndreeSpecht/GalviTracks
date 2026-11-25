@@ -89,7 +89,7 @@ const capa = [
   new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [t('Cronograma de Entregas', { bold: true, size: 56, color: AZUL })] }),
   new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [t('Sistema de Rastreamento em Tempo Real de Motoboys', { size: 32 })] }),
   new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 1400 }, children: [t('Desenvolvido pela Galvitech · Implantação na Radar Auto Peças', { size: 24, italics: true, color: '595959' })] }),
-  new Paragraph({ alignment: AlignmentType.CENTER, children: [t('Trabalho de Conclusão de Curso · 8º período, semestre final (2026/2)', { size: 22 })] }),
+  new Paragraph({ alignment: AlignmentType.CENTER, children: [t('Projeto final de curso (portfólio) · 8º período, semestre final (2026/2)', { size: 22 })] }),
   new Paragraph({ alignment: AlignmentType.CENTER, children: [t('Entregas semanais às sextas-feiras · 07/08/2026 a 04/12/2026', { size: 22 })] }),
   new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 600 }, children: [t('Autor: ', { bold: true, size: 22 }), t('André Gustavo Specht', { size: 22 })] }),
   new Paragraph({ alignment: AlignmentType.CENTER, children: [t('Professora: ', { bold: true, size: 22 }), t('Prof.ª Jessica Aline Karsten', { size: 22 })] }),
@@ -101,9 +101,8 @@ const corpo = [
   h1('1. O projeto'),
   h2('1.1 Contexto'),
   p('A Radar Auto Peças, de Jaraguá do Sul/SC, faz grande parte das suas vendas com entrega por motoboy. Até então o despacho era manual: não havia rastreamento em tempo real dos entregadores, nem cálculo de rotas otimizadas, nem registro estruturado das viagens, e os motoboys informavam sua situação por telefone ou WhatsApp. A Galvitech Ltda, empresa de software de Jaraguá do Sul/SC, desenvolve o sistema de rastreamento para resolver esse problema.'),
-  h2('1.2 Problema e pergunta de pesquisa'),
+  h2('1.2 Problema'),
   p('Sem o sistema, a loja não consegue informar prazos confiáveis ao cliente final, tem dificuldade em alocar o motoboy mais próximo, não mantém histórico para avaliar desempenho e perde a rastreabilidade entre entregas e notas fiscais.'),
-  p([t('Pergunta de pesquisa: ', { bold: true }), t('em que medida um sistema de rastreamento em tempo real de motoboys, construído com tecnologias abertas, é capaz de reduzir o tempo de planejamento de rotas e aumentar a eficiência e a rastreabilidade das entregas da Radar Auto Peças?', { italics: true })]),
   h2('1.3 Solução proposta'),
   p('Um sistema web independente, instalado no computador da loja e construído apenas com tecnologias abertas, sem custo de licenciamento:'),
   bullet([t('OwnTracks', { bold: true }), t(': app gratuito no celular do motoboy que envia a posição GPS ao servidor.')]),
@@ -113,13 +112,13 @@ const corpo = [
   p('As cinco funcionalidades principais são: (1) rastreamento GPS em tempo real, (2) gestão e otimização de rotas pela heurística do vizinho mais próximo, (3) cadastro de clientes, (4) histórico de viagens com o número da nota/pedido informado pelo operador e exportação Excel e (5) replay de trilha.', { para: { spacing: { before: 120, after: 120 } } }),
   p([t('Escopo: ', { bold: true }), t('o trabalho abrange somente o sistema de rastreamento descrito acima. Ele funciona de forma independente e não depende nem se integra a outros sistemas de gestão da loja. Os clientes são cadastrados no próprio sistema e o número da nota é digitado pelo operador na saída da entrega.')]),
   h2('1.4 Objetivos'),
-  p([t('Geral: ', { bold: true }), t('desenvolver e avaliar um sistema de rastreamento em tempo real de motoboys para a Radar Auto Peças.')]),
+  p([t('Geral: ', { bold: true }), t('desenvolver e homologar na loja um sistema de rastreamento em tempo real de motoboys para a Radar Auto Peças.')]),
   bullet('Levantar requisitos funcionais e não funcionais com a equipe da loja e os motoboys.'),
   bullet('Projetar a arquitetura do sistema e o modelo de dados.'),
   bullet('Implementar o rastreamento, as rotas, o cadastro de clientes, o histórico e o replay.'),
-  bullet('Avaliar em ambiente real por cronometragem do planejamento de rotas e pelo questionário SUS.'),
+  bullet('Homologar o sistema na loja e demonstrá-lo com um celular real.'),
   h2('1.5 Metodologia'),
-  p('O trabalho segue a Design Science Research (Hevner et al., 2004): o artefato é construído em ciclos curtos e avaliado no ambiente real. Cada ciclo corresponde a uma entrega semanal, sempre às sextas-feiras, publicada no repositório público do GitHub.'),
+  p('O trabalho segue a Design Science Research (Hevner et al., 2004): o artefato é construído em ciclos curtos e homologado no ambiente real. Cada ciclo corresponde a uma entrega semanal, sempre às sextas-feiras, publicada no repositório público do GitHub.'),
 
   h1('2. Dinâmica das entregas semanais'),
   p('Toda sexta-feira há uma entrega verificável. Uma entrega é considerada concluída quando atende aos critérios abaixo:'),
@@ -129,7 +128,7 @@ const corpo = [
   bullet('a entrega foi demonstrada à professora, quando aplicável.'),
   p([t('Repositório: ', { bold: true }), new ExternalHyperlink({ link: REPO, children: [t(REPO, { style: 'Hyperlink' })] })], { align: AlignmentType.LEFT }),
   p('As semanas 9 a 18 estão cadastradas como milestones no GitHub, com data de vencimento na sexta-feira correspondente, e as tarefas de cada semana aparecem como issues. Assim, o progresso pode ser acompanhado diretamente no repositório.'),
-  p([t('Observação: ', { bold: true }), t('as entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026. As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026; a confirmação de entrega por parada saiu do escopo e o login de operador passou para a semana 13, entregue em 25/11/2026 junto com a identidade visual Galvitech. A homologação e a avaliação (semanas 14 a 16) foram replanejadas para a reta final, a partir de 26/11/2026, com o protocolo e a planilha em docs/avaliacao. As datas desta tabela e a coluna Status podem ser editadas neste documento conforme o calendário acadêmico.', { italics: true })]),
+  p([t('Observação: ', { bold: true }), t('as entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026. As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026; a confirmação de entrega por parada saiu do escopo e o login de operador passou para a semana 13, entregue em 25/11/2026 junto com a identidade visual Galvitech. As semanas 14 a 18 foram replanejadas em 25/11/2026: o trabalho final é um portfólio, então a avaliação com cronometragem e questionário SUS deu lugar à homologação na loja, à demonstração com celular real e ao material do portfólio. As datas desta tabela e a coluna Status podem ser editadas neste documento conforme o calendário do curso.', { italics: true })]),
 
   h1('3. Marcos do projeto'),
   tabela([900, 1500, 5126, 1500], ['Marco', 'Data', 'Descrição', 'Status'], marcos, { centro: [0, 1, 3], fundoLinha: fundoStatus }),
@@ -187,16 +186,14 @@ const situacao = [
   tabela([2500, 1400, 5126], ['Risco', 'Probabilidade', 'Mitigação'], riscos, { centro: [1] }),
 
   h1('8. Resultados esperados'),
-  bullet('Redução mensurável do tempo médio de planejamento de rotas (cronometragem antes/depois).'),
+  bullet('Planejamento de rotas mais rápido, com busca de clientes e ordenação automática das paradas.'),
   bullet('Dados operacionais estruturados: posição em tempo real, sequência otimizada de paradas e histórico de viagens.'),
   bullet('Rastreabilidade de cada entrega, com o número da nota/pedido registrado no histórico.'),
-  bullet('Escore SUS na faixa "bom" (≥ 71) ou superior.'),
   bullet('Alternativa sem mensalidade às plataformas SaaS de entrega, hospedada na própria loja.'),
 
   h1('Referências'),
   ...[
     'BORGES, J. C. N. et al. Algoritmo para detecção de itinerários do transporte público usando dados de GPS dos ônibus. CoUrb 2023. SBC, 2023.',
-    'BROOKE, J. SUS: a quick and dirty usability scale. In: Usability Evaluation in Industry. London: Taylor & Francis, 1996. p. 189–194.',
     'GOLDEN, B. L.; ASSAD, A. A. (Eds.). Vehicle Routing: Methods and Studies. Amsterdam: North-Holland, 1988.',
     'HEVNER, A. R. et al. Design science in information systems research. MIS Quarterly, v. 28, n. 1, p. 75–105, 2004.',
     'LUXEN, D.; VETTER, C. Real-time routing with OpenStreetMap data. ACM SIGSPATIAL GIS, 2011. p. 513–516.',
@@ -214,7 +211,7 @@ const paisagem = { page: { size: { width: 11906, height: 16838, orientation: Pag
 const doc = new Document({
   creator: 'André Gustavo Specht',
   title: 'Cronograma de Entregas - Rastreamento de Motoboys',
-  description: 'Cronograma semanal (sextas-feiras) do TCC - Sistema de rastreamento de motoboys',
+  description: 'Cronograma semanal (sextas-feiras) do portfólio - Sistema de rastreamento de motoboys',
   styles: {
     default: { document: { run: { font: FONTE, size: 22 } } },
     paragraphStyles: [
@@ -254,9 +251,9 @@ Packer.toBuffer(doc).then((buf) => {
 if (process.argv[3]) {
   const md = [];
   md.push('# Cronograma de entregas', '');
-  md.push('> Versão editável em Word: [`Cronograma_Entregas_TCC.docx`](Cronograma_Entregas_TCC.docx)', '');
+  md.push('> Versão editável em Word: [`Cronograma_Entregas.docx`](Cronograma_Entregas.docx)', '');
   md.push('Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08/2026 a 04/12/2026. Uma entrega está concluída quando está no branch `main`, com testes passando no CI e documentação atualizada. As semanas 9 a 18 estão cadastradas como **milestones** no GitHub, com as tarefas em **issues**.', '');
-  md.push('> As entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026.', '>', '> As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026. A confirmação de entrega por parada saiu do escopo (trabalho futuro) e o login de operador passou para a semana 13, entregue em 25/11/2026 junto com a identidade visual Galvitech.', '>', '> A homologação e a avaliação (semanas 14 a 16) foram replanejadas para a reta final, a partir de 26/11/2026. Protocolo, planilha de medições e questionário SUS: [docs/avaliacao](avaliacao/).', '');
+  md.push('> As entregas das semanas 1 a 8 foram consolidadas e publicadas no repositório em 25/09/2026.', '>', '> As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026. A confirmação de entrega por parada saiu do escopo (trabalho futuro) e o login de operador passou para a semana 13, entregue em 25/11/2026 junto com a identidade visual Galvitech.', '>', '> As semanas 14 a 18 foram replanejadas em 25/11/2026: o trabalho final é um portfólio, então a avaliação com cronometragem e questionário SUS deu lugar à homologação na loja, à demonstração com celular real e ao material do portfólio.', '');
   md.push('## Marcos', '', '| Marco | Data | Descrição | Status |', '|-------|------|-----------|--------|');
   const emoji = (st) => (st.startsWith('Conclu') ? '✅' : st === 'Em andamento' ? '🔄' : '🔜');
   marcos.forEach((m) => md.push(`| ${m[0]} | ${m[1]} | ${m[2]} | ${emoji(m[3])} ${m[3]} |`));

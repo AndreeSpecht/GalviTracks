@@ -1,9 +1,9 @@
 {
   "name": "gerador-cronograma",
   "private": true,
-  "description": "Gera docs/Cronograma_Entregas_TCC.docx e docs/cronograma.md a partir de dados.js",
+  "description": "Gera docs/Cronograma_Entregas.docx e docs/cronograma.md a partir de dados.js",
   "scripts": {
-    "gerar": "node gerar.js ../../docs/Cronograma_Entregas_TCC.docx ../../docs/cronograma.md"
+    "gerar": "node gerar.js ../../docs/Cronograma_Entregas.docx ../../docs/cronograma.md"
   },
   "dependencies": {
     "docx": "^9.7.2"

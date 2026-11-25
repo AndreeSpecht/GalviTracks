@@ -117,7 +117,7 @@ Todo prazo de alerta usa hora do servidor. Timestamp GPS inválido ou mais de ci
 
 | Decisão | Alternativas consideradas | Motivo |
 |---------|---------------------------|--------|
-| **OwnTracks** no celular | App nativo próprio; rastreador veicular | Gratuito, open source, sem desenvolvimento mobile no escopo do TCC. |
+| **OwnTracks** no celular | App nativo próprio; rastreador veicular | Gratuito, open source, sem desenvolvimento mobile no escopo do projeto. |
 | **SSE com polling de fallback** | WebSocket; somente polling | Fluxo unidirecional, baixa latência, compatibilidade com a API e proxies/túneis, com limite explícito de conexões. |
 | **SQLite** | PostgreSQL | Zero instalação e arquivo único, adequado ao volume de uma loja. `db.py` isola a troca futura. |
 | **Estado da frota em memória + JSON** | Tabela no banco | Leitura sem SQL, notificações por condição e gravação atômica debounced para reduzir I/O no OneDrive. |

@@ -9,7 +9,7 @@ O projeto segue a **Design Science Research** (Hevner et al., 2004), em ciclos d
 1. **Relevância**: problema real observado na Radar Auto Peças, onde o despacho de motoboys era manual, sem rastreamento nem histórico.
 2. **Rigor**: base em trabalhos correlatos (otimização de rotas, pilha OpenStreetMap/Leaflet, tratamento de GPS) e em soluções de mercado (Vuupt, Loggi, Foody Delivery).
 3. **Design**: implementação incremental, com entregas semanais às sextas-feiras.
-4. **Avaliação**: cronometragem do planejamento de rotas (antes/depois) e questionário SUS.
+4. **Avaliação**: homologação na loja e demonstração com celular real.
 
 ## Fase 1: protótipo na loja (jan/2026)
 
@@ -92,7 +92,7 @@ Decisões:
 
 ## Próximas fases
 
-Veja o [cronograma](cronograma.md): confirmação de entrega por parada, indicadores, login de operador, homologação, avaliação em ambiente real (cronometragem + SUS) e redação final do TCC.
+Veja o [cronograma](cronograma.md): confirmação de entrega por parada, indicadores, login de operador, homologação, demonstração com celular real e material do portfólio.
 
 ## Como contribuir / padrão de trabalho
 
