@@ -61,7 +61,8 @@ Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dado
 ## Dados e configuração no repositório
 
 - **Decisão do André (11/11/2026):** o repositório é **público** e mesmo assim versiona `data/radar.db` (clientes reais da loja, com endereço e telefone), `.env`, `config/motoboys.json` e `tools/ngrok.exe`, para que um clone em qualquer PC funcione com os dados. Ele foi avisado de que os dados ficam públicos.
-- Continuam fora do git: `data/*.db-wal`, `data/*.db-shm`, `data/ngrok.log`, `data/sessao.json`, `tools/cloudflared.exe` (68 MB, não usado pelo launcher), `Entrega_Professora/`, `_legado_local/`, `.venv/`, `scripts/docs/node_modules/`.
+- `_legado_local/oficinas.db` (banco do sistema antigo, mesmas 83 oficinas do `radar.db`) também é versionado, como cópia de segurança, a pedido do André (25/11/2026).
+- Continuam fora do git: `data/*.db-wal`, `data/*.db-shm`, `data/ngrok.log`, `data/sessao.json`, `tools/cloudflared.exe` (68 MB, não usado pelo launcher), `Entrega_Professora/`, o resto de `_legado_local/`, `.venv/`, `scripts/docs/node_modules/`.
 - **Nunca commitar segredos** no `.env`: nem o authtoken do ngrok (daria a qualquer um o domínio da loja e as posições dos motoboys) nem o `OWNTRACKS_TOKEN` real. O authtoken do ngrok fica no `ngrok.yml` de cada PC (`tools\ngrok.exe config add-authtoken ...`). O `OWNTRACKS_TOKEN` fica no `.env.local` (fora do git, prioridade sobre o `.env`; `config.carregar_arquivos_env()`), criado pelo exe na primeira execução de cada PC.
 - Passo a passo para clonar em outro PC e sincronizar o banco: seção "Usar em outro PC" do README.
 - Para commitar o banco, o GalviTracks deve estar fechado (ou fazer antes `PRAGMA wal_checkpoint(FULL)`), senão alterações recentes ficam só no `-wal`.

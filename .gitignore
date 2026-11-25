@@ -30,7 +30,8 @@ tools/*
 !tools/ngrok.exe
 
 # Arquivos locais do autor / legado
-_legado_local/
+_legado_local/*
+!_legado_local/oficinas.db
 
 # IDE / SO
 .vscode/
