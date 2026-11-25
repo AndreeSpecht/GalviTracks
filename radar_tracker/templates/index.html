@@ -3,75 +3,112 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0f172a" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Cpath d='M16 6 23 25 16 21 9 25Z' fill='white'/%3E%3C/svg%3E" />
-  <title>{{ empresa }} · Rastreamento de Motoboys</title>
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" href="{{ url_for('static', filename='img/galvi.svg') }}" type="image/svg+xml" />
+  <title>GalviTracks · {{ empresa }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
   <script>
-    /* Aplica o tema antes de pintar a página, para não piscar */
+    /* Aplica o tema e o menu antes de pintar a página, para não piscar */
     (function () {
-      var tema = null;
-      try { tema = localStorage.getItem('radar.tema'); } catch (e) {}
+      var tema = null, nav = null;
+      try { tema = localStorage.getItem('radar.tema'); nav = localStorage.getItem('radar.nav'); } catch (e) {}
       if (tema !== 'claro' && tema !== 'escuro') {
         tema = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro';
       }
       document.documentElement.dataset.tema = tema;
+      if (nav === 'recolhido' || (nav === null && window.innerWidth < 1280)) {
+        document.documentElement.classList.add('nav-recolhida');
+      }
     })();
   </script>
 </head>
 <body>
 <div id="app">
-  <header class="topo">
-    <button class="btn-icone so-desktop" id="btn-painel" type="button" aria-label="Mostrar ou ocultar o painel" title="Painel"></button>
-    <div class="marca">
-      <span class="marca-logo" aria-hidden="true"></span>
-      <div class="marca-texto">
-        <strong>{{ empresa }}</strong>
-        <span>Rastreamento de entregas</span>
+  <!-- Menu lateral no padrão do ERP Galvitech (shadcn/ui sidebar) -->
+  <aside class="nav" id="nav" aria-label="Menu principal">
+    <div class="nav-cab">
+      <img class="nav-logo" src="{{ url_for('static', filename='img/galvi.svg') }}" alt="" width="32" height="32" />
+      <div class="nav-marca">
+        <strong>GalviTracks</strong>
+        <span>{{ empresa }}</span>
       </div>
     </div>
 
-    <ul class="resumo" id="resumo" aria-label="Resumo do dia"></ul>
-
-    <div class="topo-acoes">
-      <span class="conexao" id="conexao" role="status" aria-live="polite"></span>
-      <button class="btn-topo" id="btn-historico" type="button"></button>
-      <button class="btn-topo" id="btn-clientes" type="button"></button>
-      <div class="notif">
-        <button class="btn-icone" id="btn-alertas" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Alertas"></button>
-        <div class="notif-painel" id="notif-painel" role="region" aria-label="Central de alertas" hidden></div>
+    <div class="nav-conteudo">
+      <div class="nav-grupo">
+        <div class="nav-rotulo">Rastreamento</div>
+        <button class="nav-item ativo" id="nav-mapa" type="button" aria-current="page" title="Mapa ao vivo"></button>
+        <button class="nav-item" id="btn-historico" type="button" title="Histórico de viagens"></button>
+        <button class="nav-item" id="btn-clientes" type="button" title="Clientes"></button>
       </div>
-      <button class="btn-icone" id="btn-tema" type="button" aria-label="Alternar tema claro/escuro"></button>
-    </div>
-  </header>
-
-  <main class="corpo">
-    <aside class="painel" id="painel" aria-label="Frota e rotas">
-      <div class="painel-alca" id="painel-alca" aria-hidden="true"><span></span></div>
-      <div class="painel-rolagem">
-        <section class="secao">
-          <div class="secao-cab">
-            <h2>Frota</h2>
-            <span class="secao-dica">teclas 1–9</span>
-          </div>
-          <ul class="frota" id="frota" role="listbox" aria-label="Motoboys"></ul>
-        </section>
-        <section class="secao detalhe" id="detalhe" aria-live="polite"></section>
+      <div class="nav-grupo">
+        <div class="nav-rotulo">Preferências</div>
+        <button class="nav-item" id="btn-tema" type="button"></button>
       </div>
-      <footer class="painel-rodape" id="rodape"></footer>
-    </aside>
-
-    <div class="mapa-area">
-      <div id="mapa" role="application" aria-label="Mapa da frota"></div>
-      <div class="mapa-ctrl" id="mapa-ctrl"></div>
-      <div class="mira-aviso" id="mira-aviso" hidden></div>
-      <div class="replay" id="replay" hidden></div>
     </div>
-  </main>
+
+    <div class="nav-rodape">
+      <div class="nav-usuario" title="{{ empresa }}">
+        <span class="nav-avatar" id="nav-avatar"></span>
+        <span class="nav-usuario-txt">
+          <strong>{{ empresa }}</strong>
+          <span>Expedição</span>
+        </span>
+      </div>
+    </div>
+  </aside>
+  <div class="nav-fundo" id="nav-fundo" hidden></div>
+
+  <div class="inset">
+    <header class="topo">
+      <button class="btn-icone btn-gatilho" id="btn-nav" type="button" aria-controls="nav" aria-label="Mostrar ou ocultar o menu" title="Menu (Ctrl+B)"></button>
+      <span class="topo-sep" aria-hidden="true"></span>
+      <nav class="trilha" aria-label="Você está em">
+        <span class="trilha-item trilha-pai">Rastreamento</span>
+        <span class="trilha-sep" aria-hidden="true"></span>
+        <span class="trilha-item trilha-atual" aria-current="page">Mapa ao vivo</span>
+      </nav>
+
+      <ul class="resumo" id="resumo" aria-label="Resumo do dia"></ul>
+
+      <div class="topo-acoes">
+        <span class="conexao" id="conexao" role="status" aria-live="polite"></span>
+        <button class="btn-icone so-desktop" id="btn-painel" type="button" aria-label="Mostrar ou ocultar a frota" title="Frota"></button>
+        <div class="notif">
+          <button class="btn-icone" id="btn-alertas" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Alertas"></button>
+          <div class="notif-painel" id="notif-painel" role="region" aria-label="Central de alertas" hidden></div>
+        </div>
+      </div>
+    </header>
+
+    <main class="corpo">
+      <aside class="painel" id="painel" aria-label="Frota e rotas">
+        <div class="painel-alca" id="painel-alca" aria-hidden="true"><span></span></div>
+        <div class="painel-rolagem">
+          <section class="secao">
+            <div class="secao-cab">
+              <h2>Frota</h2>
+              <span class="secao-dica">teclas 1–9</span>
+            </div>
+            <ul class="frota" id="frota" role="listbox" aria-label="Motoboys"></ul>
+          </section>
+          <section class="secao detalhe" id="detalhe" aria-live="polite"></section>
+        </div>
+        <footer class="painel-rodape" id="rodape"></footer>
+      </aside>
+
+      <div class="mapa-area">
+        <div id="mapa" role="application" aria-label="Mapa da frota"></div>
+        <div class="mapa-ctrl" id="mapa-ctrl"></div>
+        <div class="mira-aviso" id="mira-aviso" hidden></div>
+        <div class="replay" id="replay" hidden></div>
+      </div>
+    </main>
+  </div>
 </div>
 
 <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
