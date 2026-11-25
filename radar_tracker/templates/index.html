@@ -52,13 +52,14 @@
     </div>
 
     <div class="nav-rodape">
-      <div class="nav-usuario" title="{{ empresa }}">
+      <button class="nav-usuario" id="btn-usuario" type="button" aria-haspopup="menu" aria-expanded="false" title="{{ usuario.nome }}">
         <span class="nav-avatar" id="nav-avatar"></span>
         <span class="nav-usuario-txt">
-          <strong>{{ empresa }}</strong>
-          <span>Expedição</span>
+          <strong>{{ usuario.nome }}</strong>
+          <span>{{ 'Gestor' if usuario.perfil == 'gestor' else 'Operador' }} · {{ empresa }}</span>
         </span>
-      </div>
+        <span class="nav-usuario-seta" id="nav-usuario-seta"></span>
+      </button>
     </div>
   </aside>
   <div class="nav-fundo" id="nav-fundo" hidden></div>
@@ -115,7 +116,7 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  window.RADAR = { empresa: {{ empresa|tojson }}, base: [{{ base_lat }}, {{ base_lon }}] };
+  window.RADAR = { empresa: {{ empresa|tojson }}, base: [{{ base_lat }}, {{ base_lon }}], usuario: {{ usuario|tojson }} };
 </script>
 <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
