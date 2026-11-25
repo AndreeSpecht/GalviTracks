@@ -4,6 +4,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/). 
 
 ## [Não lançado]
 
+### Indicadores por motoboy (#37, #39)
+- Histórico ganhou a visão **Por motoboy**: viagens, destinos por viagem, tempo médio e total em rota e km rodados no período, com linha de total da frota.
+- Km calculado pela trilha GPS gravada entre a saída e a chegada de cada viagem; viagens sem trilha não entram no km, e o painel informa quantas tinham.
+- `GET /api/indicadores` com os mesmos filtros do histórico.
+- O Excel exportado tem a aba **Indicadores** além do histórico; cabeçalhos no roxo da Galvitech.
+
+### Corrigido
+- Diálogos com tabela larga (histórico) ficavam mais largos que a tela do celular; agora a tabela rola dentro do diálogo.
+
 ## [0.9.0] - 2026-11-25 (semanas 9 a 13)
 
 Publicada antes da homologação formal com o operador da loja, que continua pendente.

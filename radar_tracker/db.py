@@ -1,5 +1,6 @@
 """Acesso ao banco SQLite: esquema, migrações leves e consultas."""
 
+import bisect
 import copy
 import logging
 import sqlite3
@@ -269,7 +270,7 @@ class Banco:
     def historico(self, inicio=None, fim=None):
         """Viagens mais recentes primeiro. inicio/fim no formato AAAA-MM-DD (inclusivos)."""
         sql = (
-            "SELECT id, data_viagem, motoboy, numero_nota, destinos, hora_saida, hora_chegada, "
+            "SELECT id, moto_id, data_viagem, motoboy, numero_nota, destinos, hora_saida, hora_chegada, "
             "inicio_ts, fim_ts, duracao_min "
             "FROM historico WHERE 1=1"
         )
@@ -283,6 +284,71 @@ class Banco:
         sql += " ORDER BY id DESC"
         with self.conexao() as conn:
             return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+    def km_das_viagens(self, viagens):
+        """Km de cada viagem pela trilha GPS gravada entre a saída e a chegada: {id_viagem: km}.
+
+        Viagens sem moto_id, sem horários ou com menos de dois pontos na trilha ficam de fora
+        (registros antigos, trilha já apagada pela retenção ou celular sem enviar posição).
+        """
+        por_moto = {}
+        for v in viagens:
+            if v.get("moto_id") is not None and v.get("inicio_ts") and v.get("fim_ts"):
+                por_moto.setdefault(v["moto_id"], []).append(v)
+        km = {}
+        with self.conexao() as conn:
+            for moto_id, lista in por_moto.items():
+                pontos = conn.execute(
+                    "SELECT timestamp, lat, lon FROM tracklog WHERE moto_id = ? AND timestamp >= ? AND timestamp <= ? "
+                    "ORDER BY timestamp, id",
+                    (moto_id, min(v["inicio_ts"] for v in lista), max(v["fim_ts"] for v in lista)),
+                ).fetchall()
+                tempos = [p["timestamp"] for p in pontos]
+                for v in lista:
+                    trecho = pontos[bisect.bisect_left(tempos, v["inicio_ts"]):bisect.bisect_right(tempos, v["fim_ts"])]
+                    if len(trecho) >= 2:
+                        km[v["id"]] = sum(geo.haversine(a["lat"], a["lon"], b["lat"], b["lon"])
+                                          for a, b in zip(trecho, trecho[1:]))
+        return km
+
+    def indicadores(self, inicio=None, fim=None):
+        """Indicadores por motoboy no período (mesmos filtros do histórico) e o total da frota.
+
+        Tempo de rota = da saída à chegada. Km = soma da trilha GPS das viagens que têm trilha;
+        "viagens_com_km" diz quantas entraram nessa conta.
+        """
+        viagens = self.historico(inicio, fim)
+        km = self.km_das_viagens(viagens)
+
+        def novo(nome):
+            return {"motoboy": nome, "viagens": 0, "destinos": 0, "minutos": 0.0, "viagens_com_tempo": 0,
+                    "km": 0.0, "viagens_com_km": 0}
+
+        grupos, total = {}, novo("Total")
+        for v in viagens:
+            nome = (v.get("motoboy") or "").strip() or "Sem nome"
+            for g in (grupos.setdefault(nome, novo(nome)), total):
+                g["viagens"] += 1
+                g["destinos"] += len([d for d in (v.get("destinos") or "").split(",") if d.strip()])
+                if v.get("duracao_min") is not None:
+                    g["minutos"] += v["duracao_min"]
+                    g["viagens_com_tempo"] += 1
+                if v["id"] in km:
+                    g["km"] += km[v["id"]]
+                    g["viagens_com_km"] += 1
+
+        def fechar(g):
+            n_tempo, n_km = g.pop("viagens_com_tempo"), g["viagens_com_km"]
+            minutos = g.pop("minutos")
+            g["tempo_total_min"] = round(minutos)
+            g["tempo_medio_min"] = round(minutos / n_tempo, 1) if n_tempo else None
+            g["destinos_por_viagem"] = round(g["destinos"] / g["viagens"], 2) if g["viagens"] else None
+            g["km"] = round(g["km"], 2) if n_km else None
+            g["km_por_viagem"] = round(g["km"] / n_km, 2) if n_km else None
+            return g
+
+        motoboys = sorted((fechar(g) for g in grupos.values()), key=lambda g: (-g["viagens"], g["motoboy"]))
+        return {"motoboys": motoboys, "total": fechar(total)}
 
     # --- Usuários do painel (login de operador) ---
     _CAMPOS_USUARIO = "id, usuario, nome, perfil, ativo, criado_em"

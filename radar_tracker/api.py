@@ -347,9 +347,61 @@ def historico():
     return jsonify(_banco().historico(request.args.get("inicio"), request.args.get("fim")))
 
 
+@bp.route("/api/indicadores")
+def indicadores():
+    return jsonify(_banco().indicadores(request.args.get("inicio"), request.args.get("fim")))
+
+
+def _texto_seguro(v):
+    """Evita que o Excel interprete texto digitado (nome, nota) como fórmula."""
+    return "'" + v if isinstance(v, str) and v.startswith(("=", "+", "-", "@")) else v
+
+
+def _cabecalho_excel(linha):
+    for celula in linha:
+        celula.font = Font(bold=True, color="FFFFFF")
+        celula.fill = PatternFill("solid", fgColor="401F71")
+
+
+def _aba_indicadores(wb, inicio, fim):
+    dados = _banco().indicadores(inicio, fim)
+    ws = wb.create_sheet("Indicadores")
+    periodo = (f"{inicio or 'início'} a {fim or 'hoje'}" if inicio or fim else "todo o histórico")
+    ws.append([f"Indicadores por motoboy · {periodo}"])
+    ws["A1"].font = Font(bold=True, size=13)
+    ws.append([])
+    colunas = [
+        ("motoboy", "Motoboy", 20, None),
+        ("viagens", "Viagens", 10, "0"),
+        ("destinos", "Destinos", 10, "0"),
+        ("destinos_por_viagem", "Destinos por viagem", 12, "0.00"),
+        ("tempo_medio_min", "Tempo médio de rota (min)", 14, "0.0"),
+        ("tempo_total_min", "Tempo total em rota (min)", 14, "0"),
+        ("km", "Km rodados (GPS)", 12, "0.00"),
+        ("km_por_viagem", "Km por viagem", 12, "0.00"),
+        ("viagens_com_km", "Viagens com trilha GPS", 12, "0"),
+    ]
+    ws.append([titulo for _, titulo, _, _ in colunas])
+    _cabecalho_excel(ws[3])
+    for g in dados["motoboys"] + [dados["total"]]:
+        ws.append([_texto_seguro(g[chave]) if g[chave] is not None else "—" for chave, _, _, _ in colunas])
+        for celula, (_, _, _, formato) in zip(ws[ws.max_row], colunas):
+            if formato:
+                celula.number_format = formato
+    for celula in ws[ws.max_row]:
+        celula.font = Font(bold=True)
+    ws.append([])
+    ws.append(["Tempo de rota: da saída à chegada. Km: soma da trilha GPS de cada viagem; viagens sem trilha "
+               "(celular sem enviar posição ou trilha com mais de 90 dias) não entram no km."])
+    for (_, _, largura, _), letra in zip(colunas, "ABCDEFGHI"):
+        ws.column_dimensions[letra].width = largura
+    ws.freeze_panes = "B4"
+
+
 @bp.route("/baixar_excel")
 def baixar_excel():
-    linhas = _banco().historico(request.args.get("inicio"), request.args.get("fim"))
+    inicio, fim = request.args.get("inicio"), request.args.get("fim")
+    linhas = _banco().historico(inicio, fim)
     colunas = [
         ("data_viagem", "Data"),
         ("motoboy", "Motoboy"),
@@ -362,15 +414,13 @@ def baixar_excel():
     ws = wb.active
     ws.title = "Histórico"
     ws.append([titulo for _, titulo in colunas])
-    for celula in ws[1]:
-        celula.font = Font(bold=True, color="FFFFFF")
-        celula.fill = PatternFill("solid", fgColor="2C3E50")
+    _cabecalho_excel(ws[1])
     for linha in linhas:
-        valores = [linha.get(chave) or "" for chave, _ in colunas]
-        ws.append(["'" + v if isinstance(v, str) and v.startswith(("=", "+", "-", "@")) else v for v in valores])
+        ws.append([_texto_seguro(linha.get(chave) or "") for chave, _ in colunas])
     for letra, largura in zip("ABCDEF", (12, 20, 16, 60, 10, 10)):
         ws.column_dimensions[letra].width = largura
     ws.freeze_panes = "A2"
+    _aba_indicadores(wb, inicio, fim)
 
     saida = io.BytesIO()
     wb.save(saida)

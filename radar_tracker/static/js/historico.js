@@ -1,4 +1,4 @@
-/* Histórico de viagens: filtros com atalhos, tabela e exportação para Excel. */
+/* Histórico de viagens: filtros com atalhos, tabela por viagem ou indicadores por motoboy e exportação para Excel. */
 import { get } from './api.js';
 import { vazio } from './clientes.js';
 import { dataISO, el } from './util.js';
@@ -14,7 +14,32 @@ function minutosEntre(saida, chegada) {
   return m;
 }
 
-const fmtDur = (m) => (m == null ? '—' : m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`);
+const fmtDur = (m) => {
+  if (m == null) return '—';
+  m = Math.round(m);
+  return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`;
+};
+const fmtNum = (n, casas = 1) => (n == null ? '—' : n.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas }));
+const fmtKm = (n) => (n == null ? '—' : `${fmtNum(n)} km`);
+
+const COLS_VIAGENS = ['Data', 'Motoboy', 'Nota', 'Destinos', 'Saída', 'Chegada', 'Duração'];
+const COLS_MOTOBOYS = ['Motoboy', 'Viagens', 'Destinos por viagem', 'Tempo médio de rota', 'Tempo total em rota', 'Km rodados', 'Km por viagem'];
+
+function linhaIndicador(g, maxViagens, tag = 'td') {
+  const c = (conteudo, classe = 'nowrap num') => el(tag, { className: classe }, conteudo);
+  const largura = maxViagens ? Math.max(4, Math.round((g.viagens / maxViagens) * 100)) : 0;
+  return el('tr', {},
+    c(el('strong', {}, g.motoboy), 'nowrap'),
+    c(tag === 'td'
+      ? el('div', { className: 'ind-viagens' }, el('span', {}, String(g.viagens)),
+        el('span', { className: 'ind-barra', 'aria-hidden': 'true' }, el('i', { style: { width: `${largura}%` } })))
+      : String(g.viagens)),
+    c(fmtNum(g.destinos_por_viagem)),
+    c(fmtDur(g.tempo_medio_min)),
+    c(fmtDur(g.tempo_total_min)),
+    c(fmtKm(g.km)),
+    c(fmtKm(g.km_por_viagem)));
+}
 
 export function abrirHistorico() {
   const hoje = new Date();
@@ -22,8 +47,24 @@ export function abrirHistorico() {
   // Abre nos últimos 7 dias: em "Hoje" a janela fica vazia antes da primeira entrega do dia.
   const inicio = el('input', { className: 'inp', type: 'date', 'aria-label': 'Data inicial', value: dataISO(seteDias) });
   const fim = el('input', { className: 'inp', type: 'date', 'aria-label': 'Data final', value: dataISO(hoje) });
+  const thead = el('thead');
   const tbody = el('tbody');
+  const tfoot = el('tfoot');
   const totais = el('div', { className: 'totais' });
+  const nota = el('p', { className: 'ind-nota mudo', hidden: true });
+  let visao = 'viagens';
+  const botoesVisao = [['viagens', 'Viagens'], ['motoboys', 'Por motoboy']].map(([chave, rotulo]) => el('button', {
+    className: `chip${chave === visao ? ' ativo' : ''}`, type: 'button', 'aria-pressed': String(chave === visao),
+    onclick: () => {
+      visao = chave;
+      botoesVisao.forEach((b, i) => {
+        const ativo = i === (chave === 'viagens' ? 0 : 1);
+        b.classList.toggle('ativo', ativo);
+        b.setAttribute('aria-pressed', String(ativo));
+      });
+      carregar();
+    },
+  }, rotulo));
 
   const atalhos = [
     ['Hoje', () => [hoje, hoje]],
@@ -51,10 +92,20 @@ export function abrirHistorico() {
   };
 
   async function carregar() {
+    const cols = visao === 'viagens' ? COLS_VIAGENS : COLS_MOTOBOYS;
+    thead.replaceChildren(el('tr', {}, ...cols.map((t, i) => el('th', { className: visao === 'motoboys' && i ? 'num' : '' }, t))));
+    tfoot.replaceChildren();
+    nota.hidden = true;
     tbody.replaceChildren(...Array.from({ length: 4 }, () => el('tr', { className: 'linha-skeleton' },
       ...Array.from({ length: 7 }, () => el('td', {}, el('span', { className: 'skeleton' }))))));
     let linhas;
-    try { linhas = await get(`/api/get_historico?${filtros()}`); } catch (e) { erro(e); tbody.replaceChildren(); return; }
+    let ind;
+    try {
+      [linhas, ind] = await Promise.all([
+        get(`/api/get_historico?${filtros()}`),
+        visao === 'motoboys' ? get(`/api/indicadores?${filtros()}`) : null,
+      ]);
+    } catch (e) { erro(e); tbody.replaceChildren(); return; }
     const durs = linhas.map((r) => minutosEntre(r.hora_saida, r.hora_chegada)).filter((x) => x != null);
     const media = durs.length ? Math.round(durs.reduce((a, b) => a + b, 0) / durs.length) : null;
     const motoboys = new Set(linhas.map((r) => r.motoboy)).size;
@@ -64,6 +115,17 @@ export function abrirHistorico() {
       el('div', {}, el('strong', {}, fmtDur(media)), el('span', {}, 'duração média')));
     if (!linhas.length) {
       tbody.replaceChildren(el('tr', {}, el('td', { colspan: '7' }, vazio('Nenhuma viagem registrada no período.', 'calendario'))));
+      return;
+    }
+    if (ind) {
+      const max = Math.max(...ind.motoboys.map((g) => g.viagens));
+      tbody.replaceChildren(...ind.motoboys.map((g) => linhaIndicador(g, max)));
+      tfoot.replaceChildren(linhaIndicador(ind.total, max, 'th'));
+      const t = ind.total;
+      nota.textContent = t.viagens_com_km === t.viagens
+        ? 'Km pela trilha GPS de cada viagem. Tempo de rota: da saída à chegada.'
+        : `Km pela trilha GPS: ${t.viagens_com_km} de ${t.viagens} viagens têm trilha (as demais não tiveram posições do celular ou passaram dos 90 dias de retenção). Tempo de rota: da saída à chegada.`;
+      nota.hidden = false;
       return;
     }
     tbody.replaceChildren(...linhas.map((r) => el('tr', {},
@@ -81,7 +143,7 @@ export function abrirHistorico() {
 
   dialogo({
     titulo: 'Histórico de viagens',
-    subtitulo: 'Entregas finalizadas, com nota, horários e destinos',
+    subtitulo: 'Entregas finalizadas e indicadores por motoboy',
     icone: 'historico',
     tamanho: 'xl',
     corpo: [
@@ -89,10 +151,9 @@ export function abrirHistorico() {
         el('div', { className: 'chips' }, ...chips),
         el('div', { className: 'datas' }, inicio, el('span', { className: 'mudo' }, 'até'), fim)),
       totais,
-      el('div', { className: 'tabela-rolagem' },
-        el('table', { className: 'tabela' },
-          el('thead', {}, el('tr', {}, ...['Data', 'Motoboy', 'Nota', 'Destinos', 'Saída', 'Chegada', 'Duração'].map((t) => el('th', {}, t)))),
-          tbody)),
+      el('div', { className: 'chips visao', role: 'group', 'aria-label': 'Ver por' }, ...botoesVisao),
+      el('div', { className: 'tabela-rolagem' }, el('table', { className: 'tabela' }, thead, tbody, tfoot)),
+      nota,
     ],
     rodape: [excel],
   });
