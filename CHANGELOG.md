@@ -4,6 +4,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/). 
 
 ## [Não lançado]
 
+### Correções
+- `scripts/simular_motoboy.py` e `scripts/verificar_stream.py` voltaram a funcionar com o login: o simulador ganhou `--usuario`/`--senha` (ou `SIMULADOR_SENHA`) e a verificação cria um gestor temporário.
+
 ### Login de operador (semana 13)
 - Painel e API exigem login; usuários na tabela `usuarios` com senha em hash scrypt (Werkzeug), perfis `gestor` e `operador`, sessão assinada de 30 dias (`SECRET_KEY` ou chave gerada em `data/chave_sessao`), cookie HttpOnly/SameSite=Lax e `COOKIE_SEGURO` para HTTPS.
 - Tela de login e de primeiro acesso no visual do ERP; o primeiro acesso cria o gestor e só funciona na rede local.

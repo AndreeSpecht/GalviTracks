@@ -103,18 +103,18 @@ Teste: com o app aberto, o ícone do motoboy deve se mover no painel em poucos s
 
 ## 5. Demonstração sem celular
 
-Monte uma rota para um motoboy no painel e execute:
+Monte uma rota para um motoboy no painel e execute (o painel exige login: `--usuario` com o seu usuário; a senha é pedida no terminal ou vem de `SIMULADOR_SENHA`):
 
 ```bash
-python scripts/simular_motoboy.py --tid 0 --velocidade 40
+python scripts/simular_motoboy.py --usuario SEU_USUARIO --tid 0 --velocidade 40
 ```
 
 Para demonstrar os alertas do painel:
 
 ```bash
-python scripts/simular_motoboy.py --tid 0 --bateria 15      # bateria baixa (aparece na hora)
-python scripts/simular_motoboy.py --tid 0 --parar-por 12    # para 12 min no meio da rota → "parado"
-python scripts/simular_motoboy.py --tid 0 --cair-sinal      # para de enviar no meio da rota → "sem sinal" após 3 min
+python scripts/simular_motoboy.py --usuario SEU_USUARIO --tid 0 --bateria 15      # bateria baixa (aparece na hora)
+python scripts/simular_motoboy.py --usuario SEU_USUARIO --tid 0 --parar-por 12    # para 12 min no meio da rota → "parado"
+python scripts/simular_motoboy.py --usuario SEU_USUARIO --tid 0 --cair-sinal      # para de enviar no meio da rota → "sem sinal" após 3 min
 ```
 
 Os tempos dos alertas podem ser reduzidos no `.env` para apresentações (ex.: `ALERTA_SEM_SINAL_MIN=0.5`).

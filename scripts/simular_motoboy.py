@@ -7,6 +7,9 @@ Uso:
     python scripts/simular_motoboy.py --tid 0
     python scripts/simular_motoboy.py --tid 1 --url http://192.168.0.10:5000 --intervalo 2 --velocidade 35 --token segredo
 
+O painel exige login: informe --usuario (a senha é pedida no terminal, ou vem de
+--senha / da variável SIMULADOR_SENHA). Qualquer usuário, gestor ou operador, serve.
+
 Demonstração dos alertas do painel:
     python scripts/simular_motoboy.py --tid 0 --bateria 15          # bateria baixa
     python scripts/simular_motoboy.py --tid 0 --parar-por 12        # parado 12 min no meio da rota
@@ -14,6 +17,8 @@ Demonstração dos alertas do painel:
 """
 
 import argparse
+import getpass
+import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 import time
@@ -38,9 +43,23 @@ def interpolar(pontos, passo_m):
     return saida
 
 
-def simular(args, mid, tid, dados, parar):
+def entrar(args):
+    """Abre uma sessão logada no painel (rotas como /api/estado exigem login)."""
+    sessao = requests.Session()
+    if not args.usuario:
+        return sessao
+    senha = args.senha or os.environ.get("SIMULADOR_SENHA") or getpass.getpass(f"Senha de {args.usuario}: ")
+    resposta = sessao.post(f"{args.url}/login", data={"usuario": args.usuario, "senha": senha},
+                           timeout=10, allow_redirects=False)
+    if resposta.status_code != 302:
+        raise SystemExit(f"Login recusado para {args.usuario!r} (HTTP {resposta.status_code}).")
+    return sessao
+
+
+def simular(args, mid, tid, dados, parar, cookies):
     """Cada motoboy tem sua conexão HTTP e seu relógio de envio."""
     with requests.Session() as sessao:
+        sessao.cookies.update(cookies)
         calc_resp = sessao.post(f"{args.url}/api/calc", json={"stops": dados["rota"]}, timeout=10)
         calc_resp.raise_for_status()
         calc = calc_resp.json()
@@ -91,6 +110,8 @@ def main():
     parser.add_argument("--intervalo", type=float, default=2.0, help="segundos entre posições")
     parser.add_argument("--velocidade", type=float, default=40, help="velocidade simulada em km/h")
     parser.add_argument("--token", default="", help="OWNTRACKS_TOKEN, se configurado no servidor")
+    parser.add_argument("--usuario", default="", help="usuário do painel (o painel exige login)")
+    parser.add_argument("--senha", default="", help="senha do usuário (padrão: SIMULADOR_SENHA ou pergunta)")
     parser.add_argument("--bateria", type=int, default=85, help="bateria do celular informada (%%)")
     parser.add_argument("--parar-por", type=float, default=0, metavar="MIN",
                         help="fica parado MIN minutos no ponto --em do trajeto (alerta de parada)")
@@ -99,10 +120,13 @@ def main():
     args = parser.parse_args()
     if args.intervalo <= 0 or args.velocidade <= 0 or args.max_posicoes < 0:
         parser.error("Intervalo/velocidade devem ser positivos e max-posicoes não negativo.")
-    estado_resp = requests.get(f"{args.url}/api/estado", timeout=5)
+    painel = entrar(args)
+    estado_resp = painel.get(f"{args.url}/api/estado", timeout=5)
+    if estado_resp.status_code == 401:
+        raise SystemExit("O painel exige login: rode de novo com --usuario <seu usuário>.")
     estado_resp.raise_for_status()
     estado = estado_resp.json()
-    cadastro_resp = requests.get(f"{args.url}/api/motoboys", timeout=5)
+    cadastro_resp = painel.get(f"{args.url}/api/motoboys", timeout=5)
     cadastro_resp.raise_for_status()
     cadastro = cadastro_resp.json()
     if args.todos:
@@ -115,7 +139,7 @@ def main():
         raise SystemExit("Nenhum motoboy selecionado com rota. Monte as rotas no painel primeiro.")
     parar = threading.Event()
     with ThreadPoolExecutor(max_workers=len(alvos), thread_name_prefix="simular") as executor:
-        tarefas = [executor.submit(simular, args, mid, tid, estado[mid], parar) for mid, tid in alvos]
+        tarefas = [executor.submit(simular, args, mid, tid, estado[mid], parar, painel.cookies) for mid, tid in alvos]
         try:
             for tarefa in as_completed(tarefas):
                 tarefa.result()

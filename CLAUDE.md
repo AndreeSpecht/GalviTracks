@@ -32,7 +32,7 @@ Rotas: OSRM público (fallback offline por Haversine) · Endereços: Nominatim �
 | `radar_tracker/static/js/main.js` | entrada do painel (módulos: mapa, marcadores, tempo-real, rota, busca, clientes, historico, replay, resumo, notificacoes, ui...) |
 | `radar_tracker/static/css/app.css` | design system com a identidade Galvitech (tokens do ERP de oficinas), tema claro/escuro |
 | `run.py` | ponto de entrada; `criar_servidor()` configura o waitress |
-| `scripts/simular_motoboy.py` | simulador do OwnTracks (`--tid`, `--todos`, `--token`, `--bateria`, `--parar-por`, `--cair-sinal`) |
+| `scripts/simular_motoboy.py` | simulador do OwnTracks (`--tid`, `--todos`, `--token`, `--usuario`/`--senha` (o painel exige login), `--bateria`, `--parar-por`, `--cair-sinal`) |
 | `scripts/seed_demo.py` | clientes fictícios |
 | `scripts/verificar_stream.py` | verificação real do SSE com waitress |
 | `scripts/windows/launcher/` | código-fonte do `GalviTracks.exe` (`GalviTracks.cs`, C# 5) + `compilar.bat` |
@@ -86,7 +86,7 @@ Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dado
 ```bash
 .venv/Scripts/python -m pytest -q          # testes (instale antes: pip install -r requirements-dev.txt)
 .venv/Scripts/python run.py                # servidor em http://127.0.0.1:5000
-.venv/Scripts/python scripts/simular_motoboy.py --todos
+.venv/Scripts/python scripts/simular_motoboy.py --todos --usuario SEU_USUARIO
 cd scripts/docs && npm install && npm run gerar   # regenera docs/Cronograma_Entregas_TCC.docx e docs/cronograma.md
 ```
 
