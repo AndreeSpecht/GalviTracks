@@ -44,7 +44,7 @@ Requisitos levantados pela Galvitech Ltda com a equipe da Radar Auto Peças, a p
 | RNF03 | **Tempo real**: atualização do mapa em até 2 s. | Consulta periódica (`/api/estado`) a cada 2 s. |
 | RNF04 | **Resiliência**: continuar operando se OSRM/Nominatim estiverem fora do ar. | Fallback offline (distância Haversine + velocidade média + tempo por parada). |
 | RNF05 | **Persistência**: não perder rotas em andamento se o servidor reiniciar. | Estado da frota gravado de forma atômica em `data/sessao.json`. |
-| RNF06 | **Usabilidade**: escore SUS na faixa "boa" (≥ 71) ou superior. | Avaliação planejada nas semanas 14–16. |
+| RNF06 | **Usabilidade**: o operador monta e despacha uma rota depois de um treinamento curto (cerca de 30 minutos). | Conferido na homologação (semana 14). |
 | RNF07 | **Responsividade**: uso no celular do operador. | Painel recolhível em telas ≤ 768 px. |
 | RNF08 | **Segurança**: endpoint de GPS não pode aceitar posições de qualquer origem. | Token (`OWNTRACKS_TOKEN`) via HTTP Basic/X-Token, obrigatório para acesso pela internet; pelo túnel só o endpoint de GPS é acessível; saída de HTML escapada no frontend. |
 | RNF09 | **Privacidade**: dados de clientes não vão para o repositório público. | Banco e configuração local no `.gitignore`; exemplos com dados fictícios. |

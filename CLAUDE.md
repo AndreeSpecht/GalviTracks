@@ -5,7 +5,7 @@ Guia para o Claude (ou qualquer pessoa) continuar o trabalho com o contexto comp
 ## O projeto
 
 - **GalviTracks**: sistema de rastreamento de motoboys em tempo real da **Radar Auto Peças** (Jaraguá do Sul/SC), desenvolvido pela **Galvitech Ltda**.
-- É o **TCC de Engenharia de Software** do André Gustavo Specht (Católica de SC, 8º período, 2026/2, Prof.ª Jessica Aline Karsten). **Defesa em 04/12/2026.**
+- É o **projeto final (portfólio) de Engenharia de Software** do André Gustavo Specht (Católica de SC, 8º período, 2026/2, Prof.ª Jessica Aline Karsten). **Apresentação em 04/12/2026.** Não é TCC monográfico: **não há artigo, SUS nem cronometragem** (decisão de 25/11/2026; os materiais de avaliação foram removidos e continuam no histórico do git, commit `99c3fe5`). Não invente dados de avaliação.
 - Repositório: https://github.com/AndreeSpecht/GalviTracks (renomeado de `rastreamento-motoboys-galvitech` em 06/11/2026; o GitHub redireciona o nome antigo). Branch principal: `main`.
 - Pasta local no PC da loja: `C:\Users\radar\OneDrive\Desktop\GalviTracks` (Windows 11, dentro do OneDrive). Substituiu a pasta antiga `RadarPecas_Instalador`.
 - Escopo: só o rastreamento. Sistema independente, sem integração com outros sistemas da loja; clientes cadastrados no próprio sistema e nº da nota digitado à mão.
@@ -87,7 +87,7 @@ Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dado
 .venv/Scripts/python -m pytest -q          # testes (instale antes: pip install -r requirements-dev.txt)
 .venv/Scripts/python run.py                # servidor em http://127.0.0.1:5000
 .venv/Scripts/python scripts/simular_motoboy.py --todos --usuario SEU_USUARIO
-cd scripts/docs && npm install && npm run gerar   # regenera docs/Cronograma_Entregas_TCC.docx e docs/cronograma.md
+cd scripts/docs && npm install && npm run gerar   # regenera docs/Cronograma_Entregas.docx e docs/cronograma.md
 ```
 
 - O `python` global não existe no PATH deste PC (abre a Microsoft Store); use sempre `.venv/Scripts/python`.
@@ -119,7 +119,6 @@ cd scripts/docs && npm install && npm run gerar   # regenera docs/Cronograma_Ent
 
 1. **Servidor na nuvem**: login pronto (branch `feat/login-operador`). Falta o André escolher o servidor (mesma EC2 do ERP, outro servidor ou VPS nova) e o domínio; depois Dockerfile + compose no padrão do ERP (`sistema-mecanica/compose.yml`), nginx com HTTPS, volume para `data/`, backup diário do banco, `ACESSO_PAINEL_INTERNET=1`, `COOKIE_SEGURO=1` e `SECRET_KEY`.
 2. **Primeiro uso real do túnel**: o André abre o `GalviTracks.exe`, digita a senha dos celulares (vai para o `.env.local`), coloca a mesma senha no OwnTracks dos motoboys e testa um motoboy real com dados móveis. As perguntas da primeira execução foram testadas em 11/11 numa cópia do projeto (senha, authtoken com o `ngrok.yml` removido e restaurado, e Enter para pular).
-3. **Avaliação na loja**: materiais prontos em `docs/avaliacao/` (protocolo `README.md`, `Planilha_Avaliacao_GalviTracks.xlsx` gerada por `scripts/docs/gerar_avaliacao.py`, `Questionario_SUS.pdf`). Cronograma proposto: base 26–27/11, treinamento e v0.9.0 27/11, piloto 30/11–02/12, SUS 02/12, análise 03/12. Para recalcular a planilha e exportar o PDF, use o Excel via COM (não há LibreOffice neste PC). Quando o André mandar a planilha preenchida: análise descritiva + Mann-Whitney (scipy) para o artigo.
-4. **Homologação na loja + release v0.9.0** (marco M3, data original 30/10 já passou; atualizar status/data quando acontecer). Lembrar de subir `__version__` e o selo do README.
-5. Piloto com cronometragem (semana 15), questionário **SUS** (semana 16, meta ≥ 71), análise e artigo (17), **v1.0.0** e defesa (18, 04/12).
-6. Menores: a seção "Situação atual" do `.docx` gerado cita 83 testes (atualizar no próximo `npm run gerar`); `send_bytes` do waitress gera DeprecationWarning nos testes.
+3. **Homologação na loja + release v0.9.0** (marco M3, data original 30/10 já passou; atualizar status/data quando acontecer). Lembrar de subir `__version__` e o selo do README.
+4. Demonstração com **um celular real** pelo túnel (semana 15), ajustes (16), material do portfólio: capturas e vídeo (17), **v1.0.0** e apresentação (18, 04/12).
+5. Menores: a seção "Situação atual" do `.docx` gerado cita 83 testes (atualizar no próximo `npm run gerar`); `send_bytes` do waitress gera DeprecationWarning nos testes.

@@ -1,6 +1,6 @@
 # Cronograma de entregas
 
-> Versão editável em Word: [`Cronograma_Entregas_TCC.docx`](Cronograma_Entregas_TCC.docx)
+> Versão editável em Word: [`Cronograma_Entregas.docx`](Cronograma_Entregas.docx)
 
 Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08/2026 a 04/12/2026. Uma entrega está concluída quando está no branch `main`, com testes passando no CI e documentação atualizada. As semanas 9 a 18 estão cadastradas como **milestones** no GitHub, com as tarefas em **issues**.
 
@@ -8,7 +8,7 @@ Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08
 >
 > As semanas 10 a 12 foram replanejadas e suas entregas (backend em tempo real, novo painel e GalviTracks.exe) publicadas em 06/11/2026. A confirmação de entrega por parada saiu do escopo (trabalho futuro) e o login de operador passou para a semana 13, entregue em 25/11/2026 junto com a identidade visual Galvitech.
 >
-> A homologação e a avaliação (semanas 14 a 16) foram replanejadas para a reta final, a partir de 26/11/2026. Protocolo, planilha de medições e questionário SUS: [docs/avaliacao](avaliacao/).
+> As semanas 14 a 18 foram replanejadas em 25/11/2026: o trabalho final é um portfólio, então a avaliação com cronometragem e questionário SUS deu lugar à homologação na loja, à demonstração com celular real e ao material do portfólio.
 
 ## Marcos
 
@@ -17,8 +17,8 @@ Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08
 | M1 | 28/08/2026 | Requisitos e projeto aprovados | ✅ Concluído |
 | M2 | 25/09/2026 | v0.8.0: sistema funcional, testado e documentado | ✅ Concluído |
 | M3 | 30/10/2026 | v0.9.0: rastreador homologado na Radar Auto Peças (replanejado para a semana 14) | 🔄 Em andamento |
-| M4 | 20/11/2026 | Avaliação em ambiente real concluída (cronometragem + SUS) | 🔜 Planejado |
-| M5 | 04/12/2026 | v1.0.0 e TCC prontos para a defesa | 🔜 Planejado |
+| M4 | 20/11/2026 | Demonstração com celular real pelo túnel concluída | 🔜 Planejado |
+| M5 | 04/12/2026 | v1.0.0 e portfólio prontos para a apresentação | 🔜 Planejado |
 
 ## Entregas semanais
 
@@ -37,11 +37,11 @@ Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08
 | 11 | 16/10/2026 | Painel | Novo painel: mapa fluido, indicadores do dia e replay aprimorado. | radar_tracker/static/js/, static/css/app.css | ✅ Concluída |
 | 12 | 23/10/2026 | Implantação | GalviTracks.exe: instalação, túnel, servidor e painel com um clique. | GalviTracks.exe, scripts/windows/launcher/ | ✅ Concluída |
 | 13 | 30/10/2026 | Segurança | Segurança do acesso externo, login de operador com perfis e identidade visual Galvitech. | radar_tracker/auth.py, issues #40–#42 fechadas | ✅ Concluída |
-| 14 | 06/11/2026 | Avaliação | Homologação na loja, treinamento da equipe e cronometragem de base (processo atual). | Planilha de medições (base) + release v0.9.0 | 🔄 Em andamento |
-| 15 | 13/11/2026 | Avaliação | Piloto em ambiente real com cronometragem usando o sistema. | Planilha de medições (piloto) | 🔜 Planejada |
-| 16 | 20/11/2026 | Avaliação | Aplicação do questionário SUS e ajustes finais de usabilidade. | Resultado SUS | 🔜 Planejada |
-| 17 | 27/11/2026 | TCC | Análise dos resultados e redação do artigo do TCC. | Artigo (versão para revisão) | 🔜 Planejada |
-| 18 | 04/12/2026 | Defesa | Revisão final, versão 1.0.0 e preparação da defesa. | Release v1.0.0 + artigo final | 🔜 Planejada |
+| 14 | 06/11/2026 | Homologação | Homologação na loja com o operador de expedição e versão v0.9.0. | Release v0.9.0 | 🔄 Em andamento |
+| 15 | 13/11/2026 | Homologação | Demonstração com celular real pelo túnel. | Motoboy real no mapa via túnel | 🔜 Planejada |
+| 16 | 20/11/2026 | Homologação | Ajustes finais de usabilidade e correções da homologação. | Commits de correção + CI verde | 🔜 Planejada |
+| 17 | 27/11/2026 | Portfólio | Material do portfólio: README, capturas de tela e vídeo de demonstração. | README com imagens + vídeo | 🔜 Planejada |
+| 18 | 04/12/2026 | Apresentação | Versão 1.0.0 e apresentação final do portfólio. | Release v1.0.0 | 🔜 Planejada |
 
 ## Detalhamento
 
@@ -175,55 +175,55 @@ Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08
 
 **Evidência:** radar_tracker/auth.py, issues #40–#42 fechadas · **Status:** Concluída
 
-### Semana 14 · 06/11/2026 · Avaliação
+### Semana 14 · 06/11/2026 · Homologação
 
-**Entrega:** Homologação na loja, treinamento da equipe e cronometragem de base (processo atual).
+**Entrega:** Homologação na loja com o operador de expedição e versão v0.9.0.
 
-- Homologação com o operador de expedição e versão v0.9.0
-- Treinamento dos operadores e motoboys; OwnTracks nos celulares
-- Medir o tempo de planejamento de rotas sem o sistema (protocolo em docs/avaliacao)
+- Conferir login, mapa, rotas, histórico e alertas com o operador de expedição
+- Treinamento rápido dos operadores
+- Release v0.9.0 no GitHub
 
-**Evidência:** Planilha de medições (base) + release v0.9.0 · **Status:** Em andamento
+**Evidência:** Release v0.9.0 · **Status:** Em andamento
 
-### Semana 15 · 13/11/2026 · Avaliação
+### Semana 15 · 13/11/2026 · Homologação
 
-**Entrega:** Piloto em ambiente real com cronometragem usando o sistema.
+**Entrega:** Demonstração com celular real pelo túnel.
 
-- Operação real por uma semana
-- Medir o tempo de planejamento com o sistema
-- Registro de incidentes e ajustes
+- OwnTracks configurado em um celular, com a senha do túnel
+- Volta com dados móveis acompanhada no painel
+- Registro de falhas e ajustes
 
-**Evidência:** Planilha de medições (piloto) · **Status:** Planejada
+**Evidência:** Motoboy real no mapa via túnel · **Status:** Planejada
 
-### Semana 16 · 20/11/2026 · Avaliação
+### Semana 16 · 20/11/2026 · Homologação
 
-**Entrega:** Aplicação do questionário SUS e ajustes finais de usabilidade.
+**Entrega:** Ajustes finais de usabilidade e correções da homologação.
 
-- Aplicar o SUS aos usuários
-- Calcular o escore (meta ≥ 71, "bom")
+- Corrigir o que apareceu na homologação e na demonstração
 - Ajustes de interface
+- Testes e documentação atualizados
 
-**Evidência:** Resultado SUS · **Status:** Planejada
+**Evidência:** Commits de correção + CI verde · **Status:** Planejada
 
-### Semana 17 · 27/11/2026 · TCC
+### Semana 17 · 27/11/2026 · Portfólio
 
-**Entrega:** Análise dos resultados e redação do artigo do TCC.
+**Entrega:** Material do portfólio: README, capturas de tela e vídeo de demonstração.
 
-- Comparar tempos antes/depois
-- Discutir a hipótese e a pergunta de pesquisa
-- Redação das seções de resultados e conclusão
+- Capturas do painel (frota, rota, histórico, replay)
+- Vídeo curto da demonstração
+- Revisão do README e da documentação
 
-**Evidência:** Artigo (versão para revisão) · **Status:** Planejada
+**Evidência:** README com imagens + vídeo · **Status:** Planejada
 
-### Semana 18 · 04/12/2026 · Defesa
+### Semana 18 · 04/12/2026 · Apresentação
 
-**Entrega:** Revisão final, versão 1.0.0 e preparação da defesa.
+**Entrega:** Versão 1.0.0 e apresentação final do portfólio.
 
-- Revisão com a professora
 - Release v1.0.0 no GitHub
-- Slides, vídeo e ensaio da apresentação
+- Roteiro da demonstração ao vivo
+- Apresentação
 
-**Evidência:** Release v1.0.0 + artigo final · **Status:** Planejada
+**Evidência:** Release v1.0.0 · **Status:** Planejada
 
 ## Riscos e mitigação
 
@@ -234,5 +234,5 @@ Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08
 | Queda de internet ou do computador da loja | Média | Sessão gravada em disco e retomada no reinício; modo offline de rotas; backup da pasta data/. |
 | Exposição do painel pelo túnel | Média | Túnel restrito ao endpoint do OwnTracks, token obrigatório e login de operador (semana 13). |
 | Baixa adesão dos motoboys ao app | Média | Treinamento na semana 14; OwnTracks com configuração única e uso passivo. |
-| Amostra pequena para o SUS | Alta | Incluir operadores, gestor e motoboys; registrar como limitação no TCC. |
+| Falha do celular na demonstração ao vivo | Média | OwnTracks fora da economia de bateria; simulador de motoboy como reserva. |
 | Atraso em alguma entrega semanal | Média | Semanas 10 a 12 replanejadas; a confirmação de entrega por parada saiu do escopo (trabalho futuro). Folga na semana 17. |

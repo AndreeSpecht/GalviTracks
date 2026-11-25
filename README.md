@@ -11,7 +11,7 @@ Sistema de rastreamento, roteirização e histórico de entregas por motoboy da 
 ![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=flat-square&logo=leaflet&logoColor=white)
 ![OpenStreetMap](https://img.shields.io/badge/OpenStreetMap-7EBC6F?style=flat-square&logo=openstreetmap&logoColor=white)
 
-> **Trabalho de Conclusão de Curso · 8º período (semestre final, 2026/2)**
+> **Projeto final de curso (portfólio) · 8º período (semestre final, 2026/2)**
 > Engenharia de Software · Centro Universitário Católica de Santa Catarina
 > Autor: **André Gustavo Specht** · Professora: **Prof.ª Jessica Aline Karsten**
 
@@ -137,7 +137,7 @@ A **Radar Auto Peças** faz boa parte das suas vendas com **entrega por motoboy*
 - **ausência de histórico** para avaliação de desempenho;
 - **perda de rastreabilidade** das entregas e das notas despachadas.
 
-> **Pergunta de pesquisa:** *em que medida um sistema de rastreamento em tempo real de motoboys, construído com tecnologias abertas, é capaz de reduzir o tempo de planejamento de rotas e aumentar a eficiência e a rastreabilidade das entregas da Radar Auto Peças?*
+> **Objetivo:** reduzir o tempo de planejamento de rotas e dar rastreabilidade às entregas por motoboy da Radar Auto Peças com um sistema de rastreamento em tempo real construído com tecnologias abertas.
 
 ## Proposta, escopo e diferencial
 
@@ -147,7 +147,7 @@ Um **sistema web independente**, instalado no computador da loja, que:
 - calcula e **otimiza rotas**, com **modo offline** se o serviço de rotas cair;
 - registra um **histórico estruturado** de cada viagem com o **número da nota/pedido** digitado pelo operador;
 - oferece **replay de trilha** e exportação em Excel;
-- é validado em ambiente real com o questionário **SUS**.
+- é homologado na operação real da loja.
 
 **Escopo:** o trabalho abrange somente o sistema de rastreamento. Ele funciona de forma independente e não depende nem se integra a outros sistemas de gestão da loja: os clientes são cadastrados no próprio sistema e o número da nota é informado manualmente.
 
@@ -235,19 +235,18 @@ A suíte cobre as funções geográficas, o ciclo de entrega, o filtro de GPS, t
 
 ## Metodologia e resultados esperados
 
-O projeto adota a **Design Science Research (DSR)** em quatro etapas: (1) levantamento de requisitos ([docs/requisitos.md](docs/requisitos.md)); (2) projeto da arquitetura e modelagem de dados; (3) implementação incremental com entregas semanais; (4) avaliação em ambiente real com cronometragem do planejamento de rotas (antes/depois) e questionário **SUS**.
+O projeto adota a **Design Science Research (DSR)** em quatro etapas: (1) levantamento de requisitos ([docs/requisitos.md](docs/requisitos.md)); (2) projeto da arquitetura e modelagem de dados; (3) implementação incremental com entregas semanais; (4) homologação na loja e demonstração com celular real.
 
 Resultados esperados:
 
 - redução do **tempo médio de planejamento de rotas**;
 - **dados operacionais estruturados** (posição em tempo real, sequência otimizada de paradas, histórico de viagens);
 - **rastreabilidade** das entregas, com o número da nota/pedido registrado no histórico;
-- escore **SUS "bom" ou superior** (≥ 71);
 - uma alternativa **sem mensalidade** às plataformas SaaS de entrega.
 
 ## Cronograma de entregas
 
-Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento completo e editável: **[docs/Cronograma_Entregas_TCC.docx](docs/Cronograma_Entregas_TCC.docx)** · versão web: [docs/cronograma.md](docs/cronograma.md). As semanas 10 a 12 foram replanejadas e entregues em 06/11/2026; a confirmação de entrega por parada saiu do escopo. A semana 13 foi entregue em 25/11/2026 e a avaliação (14 a 16) foi replanejada para a reta final. As semanas futuras estão nos [milestones do GitHub](https://github.com/AndreeSpecht/GalviTracks/milestones).
+Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento completo e editável: **[docs/Cronograma_Entregas.docx](docs/Cronograma_Entregas.docx)** · versão web: [docs/cronograma.md](docs/cronograma.md). As semanas 10 a 12 foram replanejadas e entregues em 06/11/2026; a confirmação de entrega por parada saiu do escopo. A semana 13 foi entregue em 25/11/2026. Como o trabalho final é um portfólio, as semanas 14 a 18 passaram a ser homologação, demonstração com celular real e material do portfólio. As semanas futuras estão nos [milestones do GitHub](https://github.com/AndreeSpecht/GalviTracks/milestones).
 
 | Sem. | Sexta | Entrega | Status |
 |:---:|:---:|---|:---:|
@@ -261,9 +260,9 @@ Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento 
 | 11 | 16/10 | Novo painel: mapa fluido, indicadores do dia e replay aprimorado | ✅ |
 | 12 | 23/10 | GalviTracks.exe: instalação, túnel, servidor e painel com um clique | ✅ |
 | 13 | 30/10 | Segurança do túnel, login de operador e identidade visual Galvitech | ✅ |
-| 14–16 | 06/11 – 20/11 | Homologação (**v0.9.0**) e avaliação real: cronometragem e SUS ([protocolo](docs/avaliacao/)) | 🔄 |
-| 17 | 27/11 | Análise dos resultados e escrita do TCC | 🔜 |
-| 18 | 04/12 | Revisão final e defesa · **v1.0.0** | 🔜 |
+| 14–16 | 06/11 – 20/11 | Homologação na loja (**v0.9.0**), demonstração com celular real e ajustes | 🔄 |
+| 17 | 27/11 | Material do portfólio: capturas de tela e vídeo de demonstração | 🔜 |
+| 18 | 04/12 | Apresentação final · **v1.0.0** | 🔜 |
 
 ## Documentação
 
@@ -276,7 +275,6 @@ Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento 
 | [docs/banco-de-dados.md](docs/banco-de-dados.md) | Modelo ER, sessão da frota, backup |
 | [docs/desenvolvimento.md](docs/desenvolvimento.md) | Histórico do desenvolvimento, do protótipo à versão atual |
 | [docs/cronograma.md](docs/cronograma.md) | Cronograma detalhado de entregas |
-| [docs/avaliacao/](docs/avaliacao/) | Protocolo da avaliação na loja, planilha de cronometragem e SUS, questionário para imprimir |
 | [CHANGELOG.md](CHANGELOG.md) | Mudanças por versão |
 
 ## Autor
@@ -287,4 +285,4 @@ Proprietário da Galvitech Ltda
 
 ---
 
-<sub>Trabalho de Conclusão de Curso · Engenharia de Software · 8º período (2026/2). Professora: Prof.ª Jessica Aline Karsten.</sub>
+<sub>Projeto final de curso (portfólio) · Engenharia de Software · 8º período (2026/2). Professora: Prof.ª Jessica Aline Karsten.</sub>
