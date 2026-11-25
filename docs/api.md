@@ -11,6 +11,23 @@ Erros de validação retornam **400** `{"ok": 0, "erro": "..."}` e motoboy inexi
 | GET | `/api/health` | `{"status": "ok"}`, usado para monitoramento. |
 | GET | `/api/motoboys` | Lista `[{id, nome, cor, tid}]` configurada em `config/motoboys.json`. `tid` foi acrescentado para o simulador reconhecer IDs personalizados. |
 
+## Login
+
+Todas as rotas exigem login, exceto `/login`, `/primeiro-acesso`, `/logout`, `/api/health`, `/api/gps/owntracks` (protegido pelo `OWNTRACKS_TOKEN`) e `/static/`. Sem sessão, as páginas redirecionam para `/login` e a API responde **401** com `{"ok": 0, "erro": "...", "login": 1}`. POSTs com cabeçalho `Origin` de outro site recebem **403**.
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET/POST | `/login` | Tela e envio do login (`usuario`, `senha`, `prox`). 5 erros em 5 min por IP → **429**. |
+| GET/POST | `/primeiro-acesso` | Só sem nenhum usuário e só da rede local: cria o primeiro **gestor** e já entra. |
+| POST | `/logout` | Encerra a sessão. |
+| GET | `/api/eu` | Usuário logado: `{id, usuario, nome, perfil}`. |
+| GET | `/api/usuarios` | Usuários ativos (só gestor). |
+| POST | `/api/usuarios` | Cria usuário: `{nome, usuario, senha, perfil: "operador"\|"gestor"}` (só gestor). Senha com 6+ caracteres, usuário sem espaços. |
+| POST | `/api/usuarios/<id>/senha` | Senha nova `{senha}`: o gestor para qualquer um, cada usuário para si. |
+| POST | `/api/usuarios/<id>/remover` | Remove o acesso (só gestor; não remove a si mesmo nem o último gestor). |
+
+Com `ACESSO_PAINEL_INTERNET=0` (padrão, PC da loja), quem chega pela internet continua restrito ao OwnTracks e ao `/api/health`. Com `1` (servidor na nuvem), o painel abre pela internet, sempre com login.
+
 ## Frota e rotas
 
 | Método | Rota | Corpo | Resposta |

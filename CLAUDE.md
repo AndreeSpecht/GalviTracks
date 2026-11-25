@@ -38,7 +38,7 @@ Rotas: OSRM público (fallback offline por Haversine) · Endereços: Nominatim �
 | `scripts/windows/launcher/` | código-fonte do `GalviTracks.exe` (`GalviTracks.cs`, C# 5) + `compilar.bat` |
 | `scripts/windows/tunel_ngrok.bat` | abre só o túnel |
 | `scripts/docs/` | gerador do cronograma: `dados.js` (fonte) + `gerar.js` → `.docx` e `.md` |
-| `tests/` | pytest (108 testes) |
+| `tests/` | pytest (145 testes) |
 
 Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dados, desenvolvimento, cronograma) e `CHANGELOG.md`.
 
@@ -63,7 +63,8 @@ Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dado
 - Pela internet o `OWNTRACKS_TOKEN` é obrigatório (senha do HTTP Basic do OwnTracks ou header `X-Token`); sem ele o servidor responde 403 a posições externas.
 - **Importante:** o waitress apaga cabeçalhos de proxy por padrão. `criar_servidor()` usa `clear_untrusted_proxy_headers=False`; sem isso o bloqueio não funciona em produção. O teste `test_waitress_repassa_cabecalho_do_tunel` protege isso.
 - Validado em 06/11 com túnel ngrok real (domínio da conta: `unhasty-leighton-grouty.ngrok-free.dev`).
-- **Ainda não há login de operador** (planejado para a semana 13).
+- **Login de operador** (`radar_tracker/auth.py`, 25/11/2026): todas as rotas exigem sessão, exceto login, primeiro acesso, `/api/health`, OwnTracks e `/static/`. Ordem dos `before_app_request`: primeiro o bloqueio externo (`api.py`), depois o login (`auth.py`), definida pela ordem de registro dos blueprints em `create_app`. `ACESSO_PAINEL_INTERNET=1` (nuvem) libera o painel pela internet com login. Nos testes, o fixture `client` já vem logado como gestor e `anonimo` vem sem login; o hash de teste usa pbkdf2 barato.
+- **Atenção:** os usuários (com hash scrypt das senhas) ficam no `data/radar.db`, que é versionado no repositório público. Hash scrypt não revela a senha, mas senhas fracas podem ser quebradas offline; oriente senhas fortes ou, ao ir para a nuvem, pare de versionar o banco.
 
 ## Dados e configuração no repositório
 
@@ -116,7 +117,7 @@ cd scripts/docs && npm install && npm run gerar   # regenera docs/Cronograma_Ent
 
 ## Pendências e próximos passos (por prioridade)
 
-1. **Login de operador (semana 13)**: versão enxuta, senha com hash no `.env` e sessão do Flask; perfis operador/gestor (#41) são opcionais. Issues #40–#42.
+1. **Servidor na nuvem**: login pronto (branch `feat/login-operador`). Falta o André escolher o servidor (mesma EC2 do ERP, outro servidor ou VPS nova) e o domínio; depois Dockerfile + compose no padrão do ERP (`sistema-mecanica/compose.yml`), nginx com HTTPS, volume para `data/`, backup diário do banco, `ACESSO_PAINEL_INTERNET=1`, `COOKIE_SEGURO=1` e `SECRET_KEY`.
 2. **Primeiro uso real do túnel**: o André abre o `GalviTracks.exe`, digita a senha dos celulares (vai para o `.env.local`), coloca a mesma senha no OwnTracks dos motoboys e testa um motoboy real com dados móveis. As perguntas da primeira execução foram testadas em 11/11 numa cópia do projeto (senha, authtoken com o `ngrok.yml` removido e restaurado, e Enter para pular).
 3. **Cronometragem de base (semana 14, 06/11)**: medir o tempo de planejamento de rotas no processo manual atual. Não depende do sistema; dá para começar já. Sugerido preparar planilha e protocolo de medição.
 4. **Homologação na loja + release v0.9.0** (marco M3, data original 30/10 já passou; atualizar status/data quando acontecer). Lembrar de subir `__version__` e o selo do README.
