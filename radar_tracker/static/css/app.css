@@ -171,7 +171,7 @@ h1, h2, h3, p { margin: 0; }
 .nav-item:hover, .nav-item.ativo { background: var(--nav-ativo-bg); color: var(--nav-ativo-txt); }
 .nav-item.ativo { font-weight: 500; }
 .nav-rodape { padding: 8px; flex-shrink: 0; }
-.nav-usuario { display: flex; align-items: center; gap: 8px; height: 48px; padding: 8px; border-radius: var(--r-2); overflow: hidden; }
+.nav-usuario { display: flex; align-items: center; gap: 8px; height: 48px; padding: 8px; border-radius: var(--r-2); overflow: hidden; font: inherit; }
 .nav-avatar {
   display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--r-3); flex-shrink: 0;
   background: var(--sup-3); color: var(--pri); font-size: 13px; font-weight: 500;
@@ -778,6 +778,56 @@ body.modo-mira #mapa, body.modo-mira #mapa .leaflet-interactive { cursor: crossh
 .toast-x { border: 0; background: transparent; color: var(--txt-3); width: 28px; height: 28px; border-radius: 6px; display: grid; place-items: center; }
 .toast-x:hover { background: var(--sup-3); color: var(--txt); }
 .toast-x .ic { width: 15px; height: 15px; }
+
+/* Menu do usuário (rodapé do menu lateral), como o NavUser do ERP */
+.nav-usuario { width: 100%; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; transition: background var(--t-rapida); }
+.nav-usuario:hover, .nav-usuario[aria-expanded="true"] { background: var(--nav-ativo-bg); }
+.nav-usuario-seta { margin-left: auto; display: inline-flex; color: var(--txt-3); }
+.nav-usuario-seta .ic { width: 14px; height: 14px; }
+:root.nav-recolhida .nav-usuario-seta { display: none; }
+.menu-usuario {
+  position: fixed; z-index: 3600; min-width: 224px; padding: 4px;
+  background: var(--sup); color: var(--txt); border: 1px solid var(--borda); border-radius: var(--r-2); box-shadow: var(--sombra-2);
+  animation: surgir var(--t-rapida);
+}
+.menu-usuario-cab { display: flex; align-items: center; gap: 8px; padding: 6px 8px; }
+.menu-usuario-cab div { display: grid; line-height: 1.25; min-width: 0; }
+.menu-usuario-cab strong { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.menu-usuario-cab span { font-size: 12px; color: var(--txt-3); }
+.menu-sep { height: 1px; margin: 4px -4px; background: var(--borda); }
+.menu-item {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 8px; border: 0; border-radius: var(--r-1);
+  background: transparent; color: var(--txt); font-size: 14px; text-align: left;
+}
+.menu-item .ic { color: var(--pri); }
+.menu-item:hover, .menu-item:focus-visible { background: var(--sup-3); box-shadow: none; }
+.perfil { display: inline-flex; align-items: center; height: 22px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 500; border: 1px solid var(--borda); background: var(--sup-3); color: var(--txt-3); }
+.perfil-gestor { border-color: color-mix(in srgb, var(--pri) 25%, transparent); background: color-mix(in srgb, var(--pri) 10%, transparent); color: var(--pri); }
+.campo-select { appearance: auto; }
+
+/* Tela de login (mesmo layout do login do ERP) */
+body.pagina-login { overflow: auto; background: var(--sup-3); }
+.login { min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.login-caixa { width: 100%; max-width: 384px; display: flex; flex-direction: column; gap: 24px; }
+.login-cartao { display: grid; overflow: hidden; background: var(--sup); border: 1px solid var(--borda); border-radius: var(--r-3); box-shadow: var(--sombra-1); }
+.login-form { display: flex; flex-direction: column; gap: 20px; padding: 24px; }
+.login-titulo { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; margin-bottom: 4px; }
+.login-titulo h1 { font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
+.login-titulo p { color: var(--txt-3); text-wrap: balance; }
+.login-botao { width: 100%; }
+.login-dica { font-size: 13px; color: var(--txt-3); text-align: center; }
+.login-arte { display: none; align-items: center; justify-content: center; background: var(--pri-txt); }
+.login-arte img { width: 50%; height: auto; }
+:root[data-tema="escuro"] .login-arte { background: var(--sec); }
+:root[data-tema="escuro"] .login-arte img { filter: brightness(.6) grayscale(.3); }
+.login-rodape { font-size: 12px; color: var(--txt-3); text-align: center; text-wrap: balance; }
+@media (min-width: 768px) {
+  .login { padding: 40px; }
+  .login-caixa { max-width: 768px; }
+  .login-cartao { grid-template-columns: 1fr 1fr; }
+  .login-form { padding: 32px; }
+  .login-arte { display: flex; }
+}
 
 /* 8. RESPONSIVO E ACESSIBILIDADE ---------------------------------------- */
 @media (max-width: 1440px) {

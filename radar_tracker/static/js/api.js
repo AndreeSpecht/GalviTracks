@@ -11,6 +11,11 @@ async function requisitar(url, opcoes) {
   }
   let dados = null;
   try { dados = await resp.json(); } catch { /* resposta sem JSON */ }
+  if (resp.status === 401 && dados && dados.login) {
+    // Sessão expirou (ou o usuário foi removido): volta para a tela de login.
+    window.location.assign(`/login?prox=${encodeURIComponent(window.location.pathname)}`);
+    throw new ErroApi('Sua sessão expirou. Entre novamente.');
+  }
   if (!resp.ok) throw new ErroApi((dados && dados.erro) || `Erro ${resp.status} no servidor.`);
   return dados;
 }

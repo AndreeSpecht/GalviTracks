@@ -69,7 +69,8 @@ def test_rede_local_envia_gps_sem_token(client):
 def test_host_do_dominio_ngrok_conta_como_externo(app, client):
     app.extensions["radar"]["config"].NGROK_DOMAIN = "radar.ngrok.app"
     assert client.get("/api/estado", headers={"Host": "radar.ngrok.app"}).status_code == 403
-    assert client.get("/api/estado", headers={"Host": "127.0.0.1:5000"}).status_code == 200
+    # Outro host: não é bloqueado (o cookie de teste é de "localhost", então cai no login)
+    assert client.get("/api/estado", headers={"Host": "127.0.0.1:5000"}).status_code == 401
 
 
 def test_waitress_repassa_cabecalho_do_tunel(app):
@@ -94,7 +95,7 @@ def test_waitress_repassa_cabecalho_do_tunel(app):
         assert status("/api/estado", PELO_TUNEL) == 403
         assert status("/", PELO_TUNEL) == 403
         assert status("/api/health", PELO_TUNEL) == 200
-        assert status("/api/estado", {}) == 200
+        assert status("/api/estado", {}) == 401  # rede local: não bloqueia, só pede login
     finally:
         servidor.close()
         servidor.task_dispatcher.shutdown()

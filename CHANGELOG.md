@@ -4,6 +4,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/). 
 
 ## [Não lançado]
 
+### Login de operador (semana 13)
+- Painel e API exigem login; usuários na tabela `usuarios` com senha em hash scrypt (Werkzeug), perfis `gestor` e `operador`, sessão assinada de 30 dias (`SECRET_KEY` ou chave gerada em `data/chave_sessao`), cookie HttpOnly/SameSite=Lax e `COOKIE_SEGURO` para HTTPS.
+- Tela de login e de primeiro acesso no visual do ERP; o primeiro acesso cria o gestor e só funciona na rede local.
+- Menu do usuário no rodapé do menu lateral (Usuários, Trocar minha senha, Sair) e tela de usuários para o gestor (criar, redefinir senha, remover).
+- Proteções: limite de 5 tentativas em 5 min por IP, POST de outra origem recusado, redirecionamento só para páginas do próprio sistema, sessão encerrada quando o usuário é removido.
+- `ACESSO_PAINEL_INTERNET=1` libera o painel pela internet (com login) para o servidor na nuvem; o padrão continua restrito à rede da loja.
+- `scripts/criar_usuario.py` para criar usuários, redefinir senhas e listar pelo terminal.
+- Corrigido "Sem sinal · null" no detalhe de um motoboy que nunca enviou posição.
+- 37 testes novos (145 no total).
+
 ### Identidade visual Galvitech
 - Painel com a mesma aparência do ERP de oficinas da Galvitech (`sistema-mecanica`): tokens de cor do ERP (roxo `#401F71`, lavanda, magenta, cinzas neutros), Inter, raio de 8 px, sombras e componentes no estilo shadcn/ui (botões, campos, badges de status, tabelas, diálogos, toasts).
 - Novo esqueleto de tela: menu lateral com os grupos Rastreamento (Mapa ao vivo, Histórico, Clientes) e Preferências (tema), usuário no rodapé, recolhível para ícones (Ctrl+B, preferência lembrada) e gaveta no celular; cabeçalho de 64 px com o botão do menu e a trilha de navegação.

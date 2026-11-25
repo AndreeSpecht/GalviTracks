@@ -10,9 +10,10 @@ import { adicionarParada, focarBusca, montarDetalhe, renderDetalhe, renderEstima
 import { atualizarNotificacoes, aberto as notifAberta, fechar as fecharNotif, montarNotificacoes } from './notificacoes.js';
 import { buscarResumo, renderResumo } from './resumo.js';
 import { abrirHistorico } from './historico.js';
+import { fecharMenu as fecharMenuUsuario, menuAberto as menuUsuarioAberto, montarUsuario } from './usuarios.js';
 import { abrirReplay, fecharReplay, replayAberto } from './replay.js';
 import { iniciarTempoReal } from './tempo-real.js';
-import { $, digitando, el, gravarPref, iniciais, lerPref, telaPequena } from './util.js';
+import { $, digitando, el, gravarPref, lerPref, telaPequena } from './util.js';
 import { erro, fecharDialogoTopo, haDialogoAberto } from './ui.js';
 
 /* global L */
@@ -44,7 +45,7 @@ $('#btn-historico').addEventListener('click', () => { fecharGaveta(); abrirHisto
 $('#btn-clientes').append(el('span', {}, { icone: 'usuarios' }), el('span', { className: 'rotulo' }, 'Clientes'));
 $('#btn-clientes').addEventListener('click', () => { fecharGaveta(); abrirGestao(); });
 $('#nav-mapa').addEventListener('click', () => fecharGaveta());
-$('#nav-avatar').textContent = iniciais(window.RADAR.empresa);
+montarUsuario();
 
 const btnNav = $('#btn-nav');
 btnNav.innerHTML = icone('painel');
@@ -227,6 +228,7 @@ definirFolha('min');
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     if (haDialogoAberto()) { fecharDialogoTopo(); return; }
+    if (menuUsuarioAberto()) { fecharMenuUsuario(); $('#btn-usuario').focus(); return; }
     if (emModoMira()) { sairModoMira(); return; }
     if (notifAberta()) { fecharNotif(); $('#btn-alertas').focus(); return; }
     if (document.documentElement.classList.contains('nav-aberta')) { fecharGaveta(); return; }

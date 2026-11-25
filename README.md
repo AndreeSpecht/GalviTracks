@@ -118,6 +118,7 @@ As senhas aparecem como `*` enquanto você digita. Se apertar Enter sem digitar,
 
 ### O painel
 
+- **Login de operador:** o painel pede usuário e senha (perfis *gestor* e *operador*). Na primeira vez, a tela de **primeiro acesso** cria o gestor, que depois cadastra os operadores pelo menu do usuário → *Usuários*. Senhas guardadas com hash scrypt, sessão de 30 dias, limite de tentativas. No servidor, `python scripts/criar_usuario.py` cria usuários e redefine senhas.
 - **Identidade Galvitech:** o GalviTracks complementa o ERP de oficinas da Galvitech e tem a mesma aparência: roxo Galvi `#401F71`, lavanda e magenta, fonte Inter, componentes no estilo shadcn/ui e o mesmo esqueleto de tela (menu lateral recolhível com grupos, cabeçalho com trilha de navegação). O menu recolhe para ícones com o botão do cabeçalho ou **Ctrl+B** e, no celular, abre como gaveta.
 - **Mapa fluido:** cada motoboy tem um marcador fixo que desliza entre as leituras de GPS (animação a cada quadro), gira na direção do movimento e não pisca ao atualizar. Motoboy sem sinal aparece esmaecido com o tempo desde a última posição.
 - **Tempo real:** usa Server-Sent Events (`/api/stream`) quando o servidor oferece e volta sozinho ao polling de 2 s se o stream cair. O indicador no topo mostra *Ao vivo*, *Atualizando* ou *Sem conexão*.
@@ -185,7 +186,7 @@ Detalhes, diagramas de estado e sequência e as decisões de projeto estão em [
 | Geocodificação | **Nominatim** | Busca de endereços |
 | Visualização | **Leaflet.js** | Mapa interativo |
 | Relatórios | **openpyxl** | Exportação do histórico em Excel |
-| Qualidade | **pytest · GitHub Actions** | 108 testes em Windows e Ubuntu |
+| Qualidade | **pytest · GitHub Actions** | 145 testes em Windows e Ubuntu |
 
 ## Estrutura do repositório
 
@@ -219,7 +220,7 @@ GalviTracks/
 
 ## Configuração
 
-Todas as opções ficam no arquivo `.env`, criado pelo instalador a partir de [`.env.example`](.env.example): nome e coordenadas da loja, cidade de busca, servidor OSRM, fator de atraso, token do OwnTracks e limites do filtro de GPS. Os motoboys ficam em `config/motoboys.json` (nome, cor e Tracker ID do OwnTracks).
+Todas as opções ficam no arquivo `.env`, criado pelo instalador a partir de [`.env.example`](.env.example): nome e coordenadas da loja, cidade de busca, servidor OSRM, fator de atraso, token do OwnTracks, limites do filtro de GPS e opções do login (`SECRET_KEY`, `SESSAO_DIAS`, `COOKIE_SEGURO`, `ACESSO_PAINEL_INTERNET`). Os motoboys ficam em `config/motoboys.json` (nome, cor e Tracker ID do OwnTracks).
 
 O banco (`data/radar.db`, com os clientes cadastrados), o `.env`, o `config/motoboys.json` e o `tools/ngrok.exe` **são versionados**: um clone em qualquer PC já abre com os dados da loja. Para levar alterações do banco para o GitHub, feche o GalviTracks e faça commit do `data/radar.db`. Não coloque senhas no `.env` (o repositório é público); o authtoken do ngrok é configurado uma vez por PC (ver [docs/instalacao.md](docs/instalacao.md)).
 

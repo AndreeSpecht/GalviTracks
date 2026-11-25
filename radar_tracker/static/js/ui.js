@@ -118,10 +118,13 @@ export function formulario({ titulo, subtitulo, campos, ok = 'Salvar', icone }) 
     const form = el('form', { className: 'form', novalidate: true },
       campos.map((c, i) => {
         const id = `campo-${seq}-${c.nome}`;
-        const inp = el('input', {
-          id, name: c.nome, type: c.tipo || 'text', value: c.valor ?? '', placeholder: c.placeholder,
-          autocomplete: 'off', autofocus: i === 0 ? true : undefined, className: c.tipo === 'color' ? 'inp-cor' : 'inp',
-        });
+        const inp = c.opcoes
+          ? el('select', { id, name: c.nome, className: 'inp campo-select', autofocus: i === 0 ? true : undefined },
+            c.opcoes.map(([valor, texto]) => el('option', { value: valor, selected: valor === c.valor }, texto)))
+          : el('input', {
+            id, name: c.nome, type: c.tipo || 'text', value: c.valor ?? '', placeholder: c.placeholder,
+            autocomplete: c.autocomplete || 'off', autofocus: i === 0 ? true : undefined, className: c.tipo === 'color' ? 'inp-cor' : 'inp',
+          });
         entradas[c.nome] = inp;
         return el('label', { className: 'campo', for: id },
           el('span', { className: 'campo-rotulo' }, c.rotulo, c.obrigatorio ? el('em', {}, ' *') : null),

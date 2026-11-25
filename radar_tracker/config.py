@@ -80,6 +80,16 @@ class Config:
     OWNTRACKS_TOKEN = _env("OWNTRACKS_TOKEN", "")
     # Domínio do túnel ngrok: requisições com esse Host contam como vindas da internet
     NGROK_DOMAIN = _env("NGROK_DOMAIN", "")
+
+    # Login de operador
+    # Chave que assina o cookie de sessão. Vazia = gerada uma vez e guardada em data/chave_sessao.
+    SECRET_KEY = _env("SECRET_KEY", "")
+    SESSAO_DIAS = _env_float("SESSAO_DIAS", "30")
+    # 1 = cookie só por HTTPS (servidor na nuvem). No PC da loja o painel usa http://127.0.0.1.
+    COOKIE_SEGURO = _env("COOKIE_SEGURO", "0") == "1"
+    # 0 = painel só na rede da loja (pela internet, só o OwnTracks). 1 = painel também pela
+    # internet, sempre com login (servidor na nuvem).
+    ACESSO_PAINEL_INTERNET = _env("ACESSO_PAINEL_INTERNET", "0") == "1"
     GPS_PRECISAO_MAX_M = _env_float("GPS_PRECISAO_MAX_M", "100")
     GPS_VELOCIDADE_MAX_KMH = _env_float("GPS_VELOCIDADE_MAX_KMH", "150")
     GPS_VELOCIDADE_ALPHA = _env_float("GPS_VELOCIDADE_ALPHA", "0.35")

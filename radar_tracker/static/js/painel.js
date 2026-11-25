@@ -140,7 +140,7 @@ export function renderDetalhe() {
         el('h2', {}, m.nome),
         el('div', { className: 'det-sub' },
           el('span', { className: `pill ${livre ? 'pill-livre' : 'pill-rota'}` }, livre ? 'Disponível' : 'Em rota'),
-          el('span', {}, on === null ? 'Aguardando o primeiro sinal do celular' : on ? (vel >= 3 ? `${vel} km/h` : 'Parado') : `Sem sinal · ${tempoDesde(m.recebido_em)}`),
+          el('span', {}, on === null || !m.recebido_em ? 'Aguardando o primeiro sinal do celular' : on ? (vel >= 3 ? `${vel} km/h` : 'Parado') : `Sem sinal · ${tempoDesde(m.recebido_em)}`),
           m.bateria != null && el('span', {}, { icone: m.carregando ? 'carregando' : 'bateria' }, `${m.bateria}%`))),
       el('div', { className: 'det-botoes' },
         el('button', { className: 'btn-icone', type: 'button', title: 'Centralizar no mapa', 'aria-label': 'Centralizar no mapa', onclick: () => emit('centralizar-moto', app.sel) }, { icone: 'seguir' }),

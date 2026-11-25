@@ -49,6 +49,18 @@ O painel abre em **http://127.0.0.1:5000**. Outras máquinas da mesma rede acess
 
 Opções do `run.py`: `--port 8080`, `--no-browser`, `--debug`.
 
+## Primeiro acesso e usuários
+
+Na primeira vez que o painel abre, aparece a tela de **primeiro acesso**: crie o usuário do gestor (nome, usuário e senha). Ela só aparece enquanto não existe nenhum usuário e só no próprio computador ou na rede da loja. Depois, o gestor cadastra os operadores no menu do usuário (canto inferior esquerdo) → **Usuários**, e cada um troca a própria senha em **Trocar minha senha**.
+
+Sem acesso ao painel (por exemplo, num servidor), use o terminal:
+
+```bash
+python scripts/criar_usuario.py andre --nome "André" --perfil gestor   # cria (pede a senha)
+python scripts/criar_usuario.py maria --redefinir                       # senha nova
+python scripts/criar_usuario.py --listar
+```
+
 ## 2. Configurar a loja
 
 Edite o `.env` (veja todas as opções em [`.env.example`](../.env.example)):
