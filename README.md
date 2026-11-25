@@ -247,7 +247,7 @@ Resultados esperados:
 
 ## Cronograma de entregas
 
-Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento completo e editável: **[docs/Cronograma_Entregas_TCC.docx](docs/Cronograma_Entregas_TCC.docx)** · versão web: [docs/cronograma.md](docs/cronograma.md). As semanas 10 a 12 foram replanejadas e entregues em 06/11/2026; a confirmação de entrega por parada saiu do escopo. As semanas futuras estão nos [milestones do GitHub](https://github.com/AndreeSpecht/GalviTracks/milestones).
+Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento completo e editável: **[docs/Cronograma_Entregas_TCC.docx](docs/Cronograma_Entregas_TCC.docx)** · versão web: [docs/cronograma.md](docs/cronograma.md). As semanas 10 a 12 foram replanejadas e entregues em 06/11/2026; a confirmação de entrega por parada saiu do escopo. A semana 13 foi entregue em 25/11/2026 e a avaliação (14 a 16) foi replanejada para a reta final. As semanas futuras estão nos [milestones do GitHub](https://github.com/AndreeSpecht/GalviTracks/milestones).
 
 | Sem. | Sexta | Entrega | Status |
 |:---:|:---:|---|:---:|
@@ -260,8 +260,8 @@ Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento 
 | 10 | 09/10 | Backend em tempo real (SSE), resumo do dia e robustez do GPS | ✅ |
 | 11 | 16/10 | Novo painel: mapa fluido, indicadores do dia e replay aprimorado | ✅ |
 | 12 | 23/10 | GalviTracks.exe: instalação, túnel, servidor e painel com um clique | ✅ |
-| 13 | 30/10 | Segurança do túnel, login de operador e homologação na loja · **v0.9.0** | 🔜 |
-| 14–16 | 06/11 – 20/11 | Avaliação real: cronometragem e SUS | 🔜 |
+| 13 | 30/10 | Segurança do túnel, login de operador e identidade visual Galvitech | ✅ |
+| 14–16 | 06/11 – 20/11 | Homologação (**v0.9.0**) e avaliação real: cronometragem e SUS ([protocolo](docs/avaliacao/)) | 🔄 |
 | 17 | 27/11 | Análise dos resultados e escrita do TCC | 🔜 |
 | 18 | 04/12 | Revisão final e defesa · **v1.0.0** | 🔜 |
 
@@ -276,6 +276,7 @@ Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento 
 | [docs/banco-de-dados.md](docs/banco-de-dados.md) | Modelo ER, sessão da frota, backup |
 | [docs/desenvolvimento.md](docs/desenvolvimento.md) | Histórico do desenvolvimento, do protótipo à versão atual |
 | [docs/cronograma.md](docs/cronograma.md) | Cronograma detalhado de entregas |
+| [docs/avaliacao/](docs/avaliacao/) | Protocolo da avaliação na loja, planilha de cronometragem e SUS, questionário para imprimir |
 | [CHANGELOG.md](CHANGELOG.md) | Mudanças por versão |
 
 ## Autor
