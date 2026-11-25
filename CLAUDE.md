@@ -21,7 +21,7 @@ Rotas: OSRM público (fallback offline por Haversine) · Endereços: Nominatim �
 
 | Caminho | Conteúdo |
 |---|---|
-| `radar_tracker/__init__.py` | `create_app(config, motoboys)`, `__version__ = "0.8.0"` |
+| `radar_tracker/__init__.py` | `create_app(config, motoboys)`, `__version__ = "0.9.0"` |
 | `radar_tracker/api.py` | todas as rotas, OwnTracks, Excel e o **bloqueio de acesso externo** (`_proteger_acesso_externo`) |
 | `radar_tracker/config.py` | `Config` lida do `.env`; `carregar_motoboys()` (`config/motoboys.json` ou o `.example`) |
 | `radar_tracker/frota.py` | estado dos motoboys, filtro de GPS, sessão gravada em segundo plano |
@@ -120,6 +120,6 @@ cd scripts/docs && npm install && npm run gerar   # regenera docs/Cronograma_Ent
 
 1. **Servidor na nuvem**: login pronto (branch `feat/login-operador`). Falta o André escolher o servidor (mesma EC2 do ERP, outro servidor ou VPS nova) e o domínio; depois Dockerfile + compose no padrão do ERP (`sistema-mecanica/compose.yml`), nginx com HTTPS, volume para `data/`, backup diário do banco, `ACESSO_PAINEL_INTERNET=1`, `COOKIE_SEGURO=1` e `SECRET_KEY`.
 2. **Primeiro uso real do túnel**: o André abre o `GalviTracks.exe`, digita a senha dos celulares (vai para o `.env.local`), coloca a mesma senha no OwnTracks dos motoboys e testa um motoboy real com dados móveis. As perguntas da primeira execução foram testadas em 11/11 numa cópia do projeto (senha, authtoken com o `ngrok.yml` removido e restaurado, e Enter para pular).
-3. **Homologação na loja + release v0.9.0** (marco M3, data original 30/10 já passou; atualizar status/data quando acontecer). Lembrar de subir `__version__` e o selo do README.
+3. **Homologação na loja**: a release **v0.9.0** foi publicada em 25/11/2026 sem a homologação formal; quando o operador conferir o sistema, marcar o M3 e a semana 14 como concluídos em `scripts/docs/dados.js`. Na **v1.0.0** (#59, 04/12): subir `__version__`, `pyproject.toml`, o User-Agent do Nominatim (`roteamento.py`) e o selo do README, mover o `[Não lançado]` do CHANGELOG e publicar com `gh release create`.
 4. Demonstração com **um celular real** pelo túnel (semana 15), ajustes (16), material do portfólio: capturas e vídeo (17), **v1.0.0** e apresentação (18, 04/12).
 5. Menores: a seção "Situação atual" do `.docx` gerado cita 83 testes (atualizar no próximo `npm run gerar`); `send_bytes` do waitress gera DeprecationWarning nos testes.

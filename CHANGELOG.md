@@ -4,6 +4,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/). 
 
 ## [Não lançado]
 
+## [0.9.0] - 2026-11-25 (semanas 9 a 13)
+
+Publicada antes da homologação formal com o operador da loja, que continua pendente.
+
 ### Portfólio
 - README reorganizado para apresentar o projeto: GIF de demonstração, telas (frota, rota, histórico, replay, tema escuro, login e celular), destaques técnicos e tecnologias.
 - Imagens em `docs/img/`, geradas por `scripts/docs/cena_demo.py` (servidor isolado com cópia do banco e motoboys simulados) e `scripts/docs/capturas_readme.py` (Playwright).
