@@ -1,40 +1,129 @@
-# Sistema de Rastreamento em Tempo Real de Motoboys
+# GalviTracks
 
-Sistema de rastreamento, roteirização e histórico de entregas por motoboy da **Radar Auto Peças** (Jaraguá do Sul/SC), desenvolvido pela **Galvitech Ltda** com tecnologias abertas e sem custos de licenciamento.
+Rastreamento de motoboys em tempo real, montagem de rotas e histórico de entregas da **Radar Auto Peças** (Jaraguá do Sul/SC). Desenvolvido pela **Galvitech Ltda** só com tecnologias abertas, roda no computador da própria loja e não tem mensalidade.
 
 [![Testes](https://github.com/AndreeSpecht/GalviTracks/actions/workflows/testes.yml/badge.svg)](https://github.com/AndreeSpecht/GalviTracks/actions/workflows/testes.yml)
 ![Versão](https://img.shields.io/badge/vers%C3%A3o-0.8.0-blue?style=flat-square)
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow?style=flat-square)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-000000?style=flat-square&logo=flask&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white)
 ![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=flat-square&logo=leaflet&logoColor=white)
 ![OpenStreetMap](https://img.shields.io/badge/OpenStreetMap-7EBC6F?style=flat-square&logo=openstreetmap&logoColor=white)
 
-> **Projeto final de curso (portfólio) · 8º período (semestre final, 2026/2)**
-> Engenharia de Software · Centro Universitário Católica de Santa Catarina
+![Demonstração: login, frota em tempo real, despacho de uma rota e histórico](docs/img/demo.gif)
+
+<sub>Demonstração com motoboys simulados: login, frota andando no mapa, rota otimizada, saída para entrega com o nº da nota e histórico.</sub>
+
+> **Projeto final de curso (portfólio)** · Engenharia de Software · Centro Universitário Católica de Santa Catarina · 2026/2
 > Autor: **André Gustavo Specht** · Professora: **Prof.ª Jessica Aline Karsten**
 
 ---
 
 ## Sumário
 
-- [Início rápido](#início-rápido)
-- [Usar em outro PC](#usar-em-outro-pc)
+- [O problema e a solução](#o-problema-e-a-solução)
+- [Telas](#telas)
 - [Funcionalidades](#funcionalidades)
-- [Contexto e problema](#contexto-e-problema)
-- [Proposta, escopo e diferencial](#proposta-escopo-e-diferencial)
+- [Destaques técnicos](#destaques-técnicos)
 - [Arquitetura](#arquitetura)
 - [Tecnologias](#tecnologias)
+- [Início rápido](#início-rápido)
+- [Usar em outro PC](#usar-em-outro-pc)
 - [Estrutura do repositório](#estrutura-do-repositório)
 - [Configuração](#configuração)
 - [Testes](#testes)
-- [Metodologia e resultados esperados](#metodologia-e-resultados-esperados)
-- [Cronograma de entregas](#cronograma-de-entregas)
+- [Desenvolvimento](#desenvolvimento)
 - [Documentação](#documentação)
 - [Autor](#autor)
 
 ---
+
+## O problema e a solução
+
+A Radar Auto Peças entrega peças às oficinas da região com motoboys próprios. O despacho era manual: o operador definia de memória a ordem das entregas, combinava o trajeto por telefone ou WhatsApp e não sabia onde cada motoboy estava. Não havia registro de quais notas saíram, com quem e quando.
+
+O GalviTracks resolve isso com um sistema web instalado na loja:
+
+- **o celular do motoboy vira o rastreador**, com o app gratuito OwnTracks, sem desenvolver app próprio;
+- **o operador vê a frota ao vivo** no mapa, com status, velocidade, bateria e alertas;
+- **a rota é montada em segundos**: busca o cliente, ordena as paradas pela mais próxima e mostra tempo e distância pelas ruas reais;
+- **toda saída exige o nº da nota** e fica no histórico com motoboy, horários e destinos, exportável para Excel.
+
+Plataformas como Vuupt, Loggi e Foody Delivery atendem parte disso, mas cobram mensalidade, guardam os dados em nuvem de terceiros e são feitas para outros setores.
+
+## Telas
+
+| | |
+|:---:|:---:|
+| ![Frota em tempo real com a rota do motoboy selecionado](docs/img/painel.png) | ![Rota montada e otimizada, pronta para sair](docs/img/rota.png) |
+| **Frota ao vivo:** cartões com status, velocidade e bateria; rota do motoboy no mapa | **Montagem da rota:** paradas numeradas, ordem otimizada, tempo e distância pelo OSRM |
+| ![Histórico de viagens com filtros e exportação](docs/img/historico.png) | ![Replay da trilha colorida pela velocidade](docs/img/replay.png) |
+| **Histórico:** filtros por período, totais e exportação para Excel | **Replay:** reproduz o percurso do dia, colorido pela velocidade |
+| ![Tema escuro com a central de alertas aberta](docs/img/escuro.png) | ![Tela de login](docs/img/login.png) |
+| **Tema escuro e alertas:** bateria baixa, sem sinal e parada prolongada | **Login:** perfis gestor e operador, no visual do ERP da Galvitech |
+
+<p align="center"><img src="docs/img/celular.png" width="260" alt="Painel no celular, com a frota em uma gaveta deslizante"><br><sub><b>No celular:</b> mapa em tela cheia e frota em gaveta deslizante</sub></p>
+
+## Funcionalidades
+
+| Funcionalidade | O que faz |
+|-----------|-----------|
+| **Rastreamento GPS em tempo real** | Mostra os motoboys no mapa com nome, velocidade e direção, a partir do app OwnTracks. Leituras imprecisas ou com saltos impossíveis são descartadas. |
+| **Rotas otimizadas** | Monta a rota por cliente cadastrado, endereço ou clique no mapa. Ordena pelo vizinho mais próximo e calcula trajeto e tempo pelo OSRM, com estimativa offline se o serviço cair. |
+| **Cadastro de clientes** | Clientes georreferenciados, com telefone e cor do pino, cadastrados no próprio sistema. |
+| **Histórico de viagens** | Cada saída exige o nº da nota e é registrada com motoboy, horários e destinos. Filtro por período e exportação Excel. |
+| **Replay de trilha** | Reproduz o percurso de um motoboy em um dia, com velocidades 1×, 4× e 16×. |
+| **Alertas** | Avisa quando o motoboy fica sem sinal, parado mais de 10 min fora de um cliente ou com bateria baixa. |
+| **Login e perfis** | Gestor e operador; o gestor cria e remove usuários pelo próprio painel. |
+
+Outros detalhes do painel: tema claro e escuro, layout para celular, atalhos de teclado (`/` busca, `1`–`9` motoboy, `Esc` fecha, `Ctrl+B` menu) e a mesma identidade visual do ERP de oficinas da Galvitech (roxo `#401F71`, fonte Inter, componentes no estilo shadcn/ui).
+
+## Destaques técnicos
+
+- **Tempo real por Server-Sent Events:** o painel recebe o estado da frota por stream (`/api/stream`), com mudanças agrupadas em janelas de 250 ms; em ensaio com servidor real, a posição chegou ao painel em cerca de 260 ms. Se o stream cair, o painel volta sozinho à consulta a cada 2 s.
+- **Filtro de GPS:** descarta leituras com precisão pior que 100 m, fora de ordem ou que impliquem mais de 150 km/h; suaviza a velocidade exibida e corrige horários inválidos do celular.
+- **Segurança do túnel:** os celulares chegam ao servidor da loja por um túnel ngrok, mas só o endpoint de GPS passa por ele, e com senha; painel e API respondem 403 de fora da loja. Um teste com túnel real mostrou que o Waitress apagava o cabeçalho que identifica o acesso externo; a correção está coberta por teste.
+- **Login:** senhas com hash scrypt, sessão assinada, limite de 5 tentativas em 5 min por IP e recusa de requisições de outros sites.
+- **Resiliência:** a rota em andamento sobrevive a um reinício do servidor (sessão gravada de forma atômica), e o cálculo de rotas funciona offline.
+- **Instalação em um clique:** o `GalviTracks.exe` (C#) cria o ambiente Python, abre o túnel, sobe o servidor e o painel; fechar a janela encerra tudo.
+- **Qualidade:** 145 testes automatizados com GitHub Actions em Windows e Ubuntu (Python 3.10, 3.12 e 3.13).
+
+## Arquitetura
+
+```mermaid
+flowchart LR
+    APP["📱 Celular do motoboy<br/>App OwnTracks"]
+    subgraph SRV["Servidor (Python · Flask + waitress)"]
+        API["API REST<br/>radar_tracker/api.py"]
+        FROTA["Frota em tempo real<br/>frota.py + sessao.json"]
+        DB[("SQLite<br/>clientes · histórico · trilha")]
+    end
+    OSRM["OSRM + OpenStreetMap<br/>(rotas)"]
+    WEB["🖥️ Painel web (Leaflet.js)<br/>operador da loja"]
+
+    APP -- "posição GPS (HTTP, túnel ngrok)" --> API
+    WEB <-->|"REST + SSE (/api/stream)"| API
+    API --> FROTA
+    API --> DB
+    API <-->|"trajeto e tempo"| OSRM
+```
+
+Detalhes, diagramas de estado e sequência e as decisões de projeto estão em [docs/arquitetura.md](docs/arquitetura.md).
+
+## Tecnologias
+
+| Camada | Tecnologia | Função |
+|--------|-----------|--------|
+| Geolocalização | **OwnTracks** (HTTP) | Envia a posição GPS do motoboy |
+| Backend | **Python 3.10+ · Flask · waitress** | API REST, SSE, login e servidor de produção |
+| Persistência | **SQLite** (WAL) | Clientes, usuários, histórico de viagens e trilhas GPS |
+| Roteirização | **OSRM + OpenStreetMap** | Trajeto e tempo estimado (com fallback offline) |
+| Geocodificação | **Nominatim** | Busca de endereços |
+| Painel | **Leaflet.js · JavaScript (módulos ES) · CSS** | Mapa interativo e interface, sem framework |
+| Relatórios | **openpyxl** | Exportação do histórico em Excel |
+| Acesso dos celulares | **ngrok** | Túnel HTTPS até o servidor da loja |
+| Instalador | **C# (.NET Framework)** | `GalviTracks.exe` |
+| Qualidade | **pytest · GitHub Actions** | 145 testes em Windows e Ubuntu |
 
 ## Início rápido
 
@@ -45,12 +134,10 @@ Pré-requisito: **Python 3.10+** ([download](https://www.python.org/downloads/);
 Abra a pasta do projeto e dê dois cliques em **`GalviTracks.exe`**. Ele faz tudo sozinho:
 
 1. na primeira vez, cria o ambiente Python e instala as dependências (alguns minutos, só uma vez);
-2. abre o túnel ngrok para os celulares, se `NGROK_DOMAIN` e `OWNTRACKS_TOKEN` estiverem no `.env` e o `ngrok.exe` em `tools/`. Pelo túnel só os celulares entram: o painel fica restrito à rede da loja;
+2. abre o túnel ngrok para os celulares, se `NGROK_DOMAIN` e `OWNTRACKS_TOKEN` estiverem configurados e o `ngrok.exe` estiver em `tools/`. Pelo túnel só os celulares entram: o painel fica restrito à rede da loja;
 3. sobe o servidor e abre o painel no navegador.
 
 Para encerrar, feche a janela do GalviTracks: o servidor e o túnel fecham junto. Se o programa já estiver aberto, um novo clique só abre o painel.
-
-Para obter o projeto em outro computador, veja [Usar em outro PC](#usar-em-outro-pc).
 
 **Linux / macOS**
 
@@ -60,10 +147,10 @@ cd GalviTracks
 ./instalar.sh && ./iniciar.sh
 ```
 
-O painel abre em **http://127.0.0.1:5000** com os clientes da loja (ou com clientes de demonstração, se o banco estiver vazio). Para ver um motoboy andando sem celular, monte uma rota no painel e execute:
+O painel abre em **http://127.0.0.1:5000**. Na primeira vez, a tela de **primeiro acesso** cria o gestor. Para ver um motoboy andando sem celular, monte uma rota no painel e execute:
 
 ```bash
-python scripts/simular_motoboy.py --tid 0      # use .venv\Scripts\python no Windows
+python scripts/simular_motoboy.py --tid 0 --usuario SEU_USUARIO   # use .venv\Scripts\python no Windows
 ```
 
 Instalação manual, túnel para os celulares (ngrok) e configuração do app OwnTracks estão em **[docs/instalacao.md](docs/instalacao.md)**.
@@ -105,124 +192,43 @@ As senhas aparecem como `*` enquanto você digita. Se apertar Enter sem digitar,
   No primeiro `git push` o Windows pede para entrar na conta do GitHub. Se o Git pedir nome e e-mail, configure uma vez com `git config --global user.name "Seu Nome"` e `git config --global user.email "seu@email"`.
 - **Use o sistema em um PC por vez.** Se dois PCs alterarem o banco ao mesmo tempo, o Git não consegue juntar os dois e uma das versões precisa ser descartada.
 
-## Funcionalidades
-
-| # | Funcionalidade | O que faz | Status |
-|---|-----------|-----------|--------|
-| 1 | **Rastreamento GPS em tempo real** | Mostra todos os motoboys no mapa, com nome e velocidade, atualizando a cada 2 s a partir do app OwnTracks. Leituras imprecisas ou com saltos impossíveis são descartadas. | ✅ |
-| 2 | **Gestão e otimização de rotas** | Monta a rota por cliente cadastrado, busca de endereço ou clique no mapa. Calcula trajeto e tempo pelo OSRM, otimiza pela heurística do vizinho mais próximo e tem modo offline. | ✅ |
-| 3 | **Cadastro de clientes** | Cadastro georreferenciado com telefone e cor, feito no próprio sistema (clique no mapa ou busca de endereço). | ✅ |
-| 4 | **Histórico de viagens** | Cada entrega exige o nº da nota e é registrada com motoboy, horários e destinos. Filtro por período e exportação Excel. | ✅ |
-| 5 | **Replay de trilha** | Reproduz o percurso do motoboy em um dia, para auditoria e avaliação. | ✅ |
-| 6 | **Alertas de status** | Avisa no painel quando o motoboy fica sem sinal, parado muito tempo fora de um cliente ou com bateria baixa no celular. | ✅ |
-
-### O painel
-
-- **Login de operador:** o painel pede usuário e senha (perfis *gestor* e *operador*). Na primeira vez, a tela de **primeiro acesso** cria o gestor, que depois cadastra os operadores pelo menu do usuário → *Usuários*. Senhas guardadas com hash scrypt, sessão de 30 dias, limite de tentativas. No servidor, `python scripts/criar_usuario.py` cria usuários e redefine senhas.
-- **Identidade Galvitech:** o GalviTracks complementa o ERP de oficinas da Galvitech e tem a mesma aparência: roxo Galvi `#401F71`, lavanda e magenta, fonte Inter, componentes no estilo shadcn/ui e o mesmo esqueleto de tela (menu lateral recolhível com grupos, cabeçalho com trilha de navegação). O menu recolhe para ícones com o botão do cabeçalho ou **Ctrl+B** e, no celular, abre como gaveta.
-- **Mapa fluido:** cada motoboy tem um marcador fixo que desliza entre as leituras de GPS (animação a cada quadro), gira na direção do movimento e não pisca ao atualizar. Motoboy sem sinal aparece esmaecido com o tempo desde a última posição.
-- **Tempo real:** usa Server-Sent Events (`/api/stream`) quando o servidor oferece e volta sozinho ao polling de 2 s se o stream cair. O indicador no topo mostra *Ao vivo*, *Atualizando* ou *Sem conexão*.
-- **Visão da frota:** cartões com status, velocidade, bateria e alertas; resumo do dia no topo (em rota, disponíveis, alertas, entregas e km); central de alertas com aviso na tela e som opcional para alertas críticos.
-- **Montagem da rota:** busca única com autocompletar (clientes cadastrados primeiro, depois endereços), paradas numeradas no mapa e na lista, estimativa de tempo e distância e botão de saída que exige o nº da nota.
-- **Clientes:** cadastro pelo botão *Novo cliente* (clique no mapa para posicionar), com telefone e cor do pino; edição e exclusão em lista com filtro.
-- **Histórico e replay:** filtros rápidos (Hoje, 7 dias, Este mês), totais do período e exportação Excel; replay com play/pausa, velocidades 1×/4×/16× e trilha colorida pela velocidade.
-- **Uso confortável:** tema claro e escuro (segue o sistema, com botão para alternar), layout de celular com painel deslizante, atalhos de teclado (`/` busca, `1`–`9` motoboy, `Esc` fecha) e foco visível em todos os controles.
-
-## Contexto e problema
-
-A **Radar Auto Peças** faz boa parte das suas vendas com **entrega por motoboy**. O despacho era manual: não havia rastreamento dos entregadores, cálculo de rotas nem registro estruturado das viagens, e a situação de cada motoboy era acompanhada por telefone ou WhatsApp. As consequências eram:
-
-- impossibilidade de informar **prazos confiáveis** ao cliente;
-- dificuldade de **alocar o motoboy mais próximo**;
-- **ausência de histórico** para avaliação de desempenho;
-- **perda de rastreabilidade** das entregas e das notas despachadas.
-
-> **Objetivo:** reduzir o tempo de planejamento de rotas e dar rastreabilidade às entregas por motoboy da Radar Auto Peças com um sistema de rastreamento em tempo real construído com tecnologias abertas.
-
-## Proposta, escopo e diferencial
-
-Um **sistema web independente**, instalado no computador da loja, que:
-
-- mostra os motoboys no mapa em **tempo real** a partir do celular (app OwnTracks);
-- calcula e **otimiza rotas**, com **modo offline** se o serviço de rotas cair;
-- registra um **histórico estruturado** de cada viagem com o **número da nota/pedido** digitado pelo operador;
-- oferece **replay de trilha** e exportação em Excel;
-- é homologado na operação real da loja.
-
-**Escopo:** o trabalho abrange somente o sistema de rastreamento. Ele funciona de forma independente e não depende nem se integra a outros sistemas de gestão da loja: os clientes são cadastrados no próprio sistema e o número da nota é informado manualmente.
-
-Plataformas SaaS como Vuupt, Loggi e Foody Delivery confirmam a demanda, mas cobram mensalidade, hospedam os dados em nuvem de terceiros e são voltadas a outros setores. Este sistema usa apenas software livre e roda na própria loja, sem custo de licença.
-
-## Arquitetura
-
-```mermaid
-flowchart LR
-    APP["📱 Celular do motoboy<br/>App OwnTracks"]
-    subgraph SRV["Servidor (Python · Flask + waitress)"]
-        API["API REST<br/>radar_tracker/api.py"]
-        FROTA["Frota em tempo real<br/>frota.py + sessao.json"]
-        DB[("SQLite<br/>clientes · histórico · trilha")]
-    end
-    OSRM["OSRM + OpenStreetMap<br/>(rotas)"]
-    WEB["🖥️ Painel web (Leaflet.js)<br/>operador da loja"]
-
-    APP -- "posição GPS (HTTP, ~2 s)" --> API
-    WEB <-->|"REST + SSE (/api/stream)"| API
-    API --> FROTA
-    API --> DB
-    API <-->|"trajeto e tempo"| OSRM
-```
-
-Detalhes, diagramas de estado e sequência e as decisões de projeto estão em [docs/arquitetura.md](docs/arquitetura.md).
-
-## Tecnologias
-
-| Camada | Tecnologia | Função |
-|--------|-----------|--------|
-| Geolocalização | **OwnTracks** (HTTP) | Envia a posição GPS do motoboy |
-| Backend | **Python 3.10+ · Flask · waitress** | API REST, regras de negócio e servidor de produção |
-| Persistência | **SQLite** | Clientes, histórico de viagens e trilhas GPS |
-| Roteirização | **OSRM + OpenStreetMap** | Trajeto e tempo estimado (com fallback offline) |
-| Geocodificação | **Nominatim** | Busca de endereços |
-| Visualização | **Leaflet.js** | Mapa interativo |
-| Relatórios | **openpyxl** | Exportação do histórico em Excel |
-| Qualidade | **pytest · GitHub Actions** | 145 testes em Windows e Ubuntu |
-
 ## Estrutura do repositório
 
 ```
 GalviTracks/
 ├── radar_tracker/            # aplicação (pacote Python)
 │   ├── __init__.py           # create_app()
-│   ├── api.py                # endpoints REST + OwnTracks + Excel
-│   ├── config.py             # configuração via .env
+│   ├── api.py                # endpoints REST + OwnTracks + Excel + bloqueio do acesso externo
+│   ├── auth.py               # login, perfis e usuários
+│   ├── config.py             # configuração via .env e .env.local
 │   ├── db.py                 # SQLite: esquema, migrações, consultas
 │   ├── frota.py              # estado dos motoboys + filtro de GPS
+│   ├── stream.py             # Server-Sent Events
+│   ├── alertas.py            # sem sinal, parado, bateria baixa
 │   ├── geo.py                # haversine, velocidade, vizinho mais próximo
 │   ├── roteamento.py         # OSRM + fallback offline + Nominatim
-│   ├── templates/index.html  # painel
+│   ├── templates/            # painel e login
 │   └── static/               # CSS (design system) e módulos JS do painel (js/main.js)
-├── config/motoboys.example.json
+├── config/motoboys.json
 ├── scripts/
-│   ├── seed_demo.py          # clientes fictícios
 │   ├── simular_motoboy.py    # simulador do OwnTracks
-│   ├── windows/launcher/     # código-fonte, ícone e compilação do GalviTracks.exe
-│   ├── windows/tunel_ngrok.bat
+│   ├── criar_usuario.py      # cria usuários e redefine senhas pelo terminal
+│   ├── seed_demo.py          # clientes fictícios
+│   ├── windows/launcher/     # código-fonte e compilação do GalviTracks.exe
 │   └── docs/                 # gerador do cronograma (.docx/.md)
 ├── tests/                    # suíte pytest
-├── docs/                     # documentação e cronograma
-├── GalviTracks.exe          # Windows: um clique instala, abre o túnel, o servidor e o painel
+├── docs/                     # documentação, cronograma e imagens
+├── GalviTracks.exe           # Windows: um clique instala, abre o túnel, o servidor e o painel
 ├── instalar.sh · iniciar.sh  # Linux/macOS
 ├── run.py                    # ponto de entrada
-├── requirements.txt · requirements-dev.txt · .env.example
 └── .github/workflows/testes.yml
 ```
 
 ## Configuração
 
-Todas as opções ficam no arquivo `.env`, criado pelo instalador a partir de [`.env.example`](.env.example): nome e coordenadas da loja, cidade de busca, servidor OSRM, fator de atraso, token do OwnTracks, limites do filtro de GPS e opções do login (`SECRET_KEY`, `SESSAO_DIAS`, `COOKIE_SEGURO`, `ACESSO_PAINEL_INTERNET`). Os motoboys ficam em `config/motoboys.json` (nome, cor e Tracker ID do OwnTracks).
+Todas as opções ficam no arquivo `.env` (modelo em [`.env.example`](.env.example)): nome e coordenadas da loja, cidade de busca, servidor OSRM, fator de atraso, token do OwnTracks, limites do filtro de GPS e opções do login (`SECRET_KEY`, `SESSAO_DIAS`, `COOKIE_SEGURO`, `ACESSO_PAINEL_INTERNET`). Senhas ficam no `.env.local`, que não vai para o Git. Os motoboys ficam em `config/motoboys.json` (nome, cor e Tracker ID do OwnTracks).
 
-O banco (`data/radar.db`, com os clientes cadastrados), o `.env`, o `config/motoboys.json` e o `tools/ngrok.exe` **são versionados**: um clone em qualquer PC já abre com os dados da loja. Para levar alterações do banco para o GitHub, feche o GalviTracks e faça commit do `data/radar.db`. Não coloque senhas no `.env` (o repositório é público); o authtoken do ngrok é configurado uma vez por PC (ver [docs/instalacao.md](docs/instalacao.md)).
+O banco (`data/radar.db`), o `.env`, o `config/motoboys.json` e o `tools/ngrok.exe` **são versionados**, para que um clone em qualquer PC já abra com os dados da loja.
 
 ## Testes
 
@@ -231,38 +237,11 @@ pip install -r requirements-dev.txt
 pytest
 ```
 
-A suíte cobre as funções geográficas, o ciclo de entrega, o filtro de GPS, todos os endpoints, o OwnTracks (com e sem token), o bloqueio do acesso pela internet e a exportação Excel. A rede fica bloqueada durante os testes, o que também valida o modo offline. O CI roda a cada push em Windows e Ubuntu (Python 3.10, 3.12 e 3.13).
+A suíte cobre as funções geográficas, o filtro de GPS, o ciclo de entrega, todos os endpoints, o OwnTracks, o tempo real, os alertas, o login, o bloqueio do acesso pela internet e a exportação Excel. A rede fica bloqueada durante os testes, o que também valida o modo offline. `python scripts/verificar_stream.py` faz o ensaio de tempo real com o servidor Waitress de verdade.
 
-## Metodologia e resultados esperados
+## Desenvolvimento
 
-O projeto adota a **Design Science Research (DSR)** em quatro etapas: (1) levantamento de requisitos ([docs/requisitos.md](docs/requisitos.md)); (2) projeto da arquitetura e modelagem de dados; (3) implementação incremental com entregas semanais; (4) homologação na loja e demonstração com celular real.
-
-Resultados esperados:
-
-- redução do **tempo médio de planejamento de rotas**;
-- **dados operacionais estruturados** (posição em tempo real, sequência otimizada de paradas, histórico de viagens);
-- **rastreabilidade** das entregas, com o número da nota/pedido registrado no histórico;
-- uma alternativa **sem mensalidade** às plataformas SaaS de entrega.
-
-## Cronograma de entregas
-
-Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento completo e editável: **[docs/Cronograma_Entregas.docx](docs/Cronograma_Entregas.docx)** · versão web: [docs/cronograma.md](docs/cronograma.md). As semanas 10 a 12 foram replanejadas e entregues em 06/11/2026; a confirmação de entrega por parada saiu do escopo. A semana 13 foi entregue em 25/11/2026. Como o trabalho final é um portfólio, as semanas 14 a 18 passaram a ser homologação, demonstração com celular real e material do portfólio. As semanas futuras estão nos [milestones do GitHub](https://github.com/AndreeSpecht/GalviTracks/milestones).
-
-| Sem. | Sexta | Entrega | Status |
-|:---:|:---:|---|:---:|
-| 1–2 | 07/08 – 14/08 | Levantamento e validação de requisitos | ✅ |
-| 3–4 | 21/08 – 28/08 | Arquitetura, modelo de dados e contrato da API | ✅ |
-| 5–6 | 04/09 – 11/09 | Rastreamento GPS (OwnTracks), filtro de GPS e simulador | ✅ |
-| 7 | 18/09 | Roteirização OSRM + vizinho mais próximo + offline | ✅ |
-| 8 | 25/09 | Refatoração, testes, CI e documentação · **v0.8.0** | ✅ |
-| 9 | 02/10 | Alertas: sinal perdido, parada prolongada e bateria baixa | ✅ |
-| 10 | 09/10 | Backend em tempo real (SSE), resumo do dia e robustez do GPS | ✅ |
-| 11 | 16/10 | Novo painel: mapa fluido, indicadores do dia e replay aprimorado | ✅ |
-| 12 | 23/10 | GalviTracks.exe: instalação, túnel, servidor e painel com um clique | ✅ |
-| 13 | 30/10 | Segurança do túnel, login de operador e identidade visual Galvitech | ✅ |
-| 14–16 | 06/11 – 20/11 | Homologação na loja (**v0.9.0**), demonstração com celular real e ajustes | 🔄 |
-| 17 | 27/11 | Material do portfólio: capturas de tela e vídeo de demonstração | 🔜 |
-| 18 | 04/12 | Apresentação final · **v1.0.0** | 🔜 |
+O projeto foi construído em entregas semanais, de agosto a dezembro de 2026, a partir de um protótipo usado no balcão da loja em janeiro. Requisitos, arquitetura, GPS, rotas, alertas, tempo real, painel novo, instalador, segurança e login vieram nessa ordem; o caminho está em [docs/desenvolvimento.md](docs/desenvolvimento.md), o cronograma em [docs/cronograma.md](docs/cronograma.md) e as mudanças por versão no [CHANGELOG](CHANGELOG.md).
 
 ## Documentação
 
@@ -274,7 +253,7 @@ Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento 
 | [docs/api.md](docs/api.md) | Referência de todos os endpoints |
 | [docs/banco-de-dados.md](docs/banco-de-dados.md) | Modelo ER, sessão da frota, backup |
 | [docs/desenvolvimento.md](docs/desenvolvimento.md) | Histórico do desenvolvimento, do protótipo à versão atual |
-| [docs/cronograma.md](docs/cronograma.md) | Cronograma detalhado de entregas |
+| [docs/cronograma.md](docs/cronograma.md) | Cronograma de entregas ([versão Word](docs/Cronograma_Entregas.docx)) |
 | [CHANGELOG.md](CHANGELOG.md) | Mudanças por versão |
 
 ## Autor
@@ -282,7 +261,3 @@ Entregas **toda sexta-feira** do semestre final (07/08 a 04/12/2026). Documento 
 **André Gustavo Specht**
 Engenharia de Software, Centro Universitário Católica de Santa Catarina (Jaraguá do Sul/SC)
 Proprietário da Galvitech Ltda
-
----
-
-<sub>Projeto final de curso (portfólio) · Engenharia de Software · 8º período (2026/2). Professora: Prof.ª Jessica Aline Karsten.</sub>
