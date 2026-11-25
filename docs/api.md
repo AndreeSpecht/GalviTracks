@@ -169,7 +169,7 @@ Para conferir manualmente com o servidor e rotas já montadas, em terminais sepa
 ```bash
 python run.py --no-browser
 curl -N http://127.0.0.1:5000/api/stream
-python scripts/simular_motoboy.py --todos --token SUA_SENHA
+python scripts/simular_motoboy.py --todos --token SUA_SENHA --usuario SEU_USUARIO
 ```
 
 O simulador aceita `--max-posicoes 25` para uma execução curta; `--todos` usa o `tid` real de cada motoboy e uma thread/conexão HTTP por motoboy.

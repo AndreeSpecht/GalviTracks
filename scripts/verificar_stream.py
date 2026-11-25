@@ -68,8 +68,17 @@ def executar():
             else:
                 raise RuntimeError("Timeout iniciando Waitress.")
 
+            # O painel exige login: cria um gestor temporário e passa o cookie também ao curl.
+            from werkzeug.security import generate_password_hash
+            app.extensions["radar"]["banco"].criar_usuario(
+                "verificacao", "Verificação", generate_password_hash("senha-temporaria"), "gestor")
+            sessao = requests.Session()
+            sessao.post(url + "/login", data={"usuario": "verificacao", "senha": "senha-temporaria"},
+                        timeout=5).raise_for_status()
+            cookie = "galvitracks_sessao=" + sessao.cookies.get("galvitracks_sessao")
+
             fila = queue.Queue()
-            cliente = subprocess.Popen([curl, "-N", "-sS", "--max-time", "45", url + "/api/stream"],
+            cliente = subprocess.Popen([curl, "-N", "-sS", "--max-time", "45", "-H", "Cookie: " + cookie, url + "/api/stream"],
                                        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, **flags)
 
             def consumir():
@@ -83,13 +92,13 @@ def executar():
             leitor.start()
             _, primeiro = fila.get(timeout=5)
             assert isinstance(primeiro, dict), "Primeiro evento precisa ser snapshot."
-            cadastro = requests.get(url + "/api/motoboys", timeout=2).json()
+            cadastro = sessao.get(url + "/api/motoboys", timeout=2).json()
             mid, tid = str(cadastro[0]["id"]), cadastro[0]["tid"]
             lat, lon = primeiro[mid]["lat_atual"], primeiro[mid]["lon_atual"]
             latencias = []
             for i in range(1, 21):
                 inicio = time.perf_counter()
-                requests.post(url + "/api/gps/owntracks", timeout=2,
+                sessao.post(url + "/api/gps/owntracks", timeout=2,
                               json={"_type": "location", "tid": tid, "lat": lat, "lon": lon,
                                     "cog": i, "acc": 8, "tst": int(time.time())}).raise_for_status()
                 while True:
@@ -100,17 +109,18 @@ def executar():
             assert max(latencias) < 300, f"Latência excessiva: {max(latencias):.1f} ms"
 
             # Limite real no Waitress e API atendendo com ambas as vagas SSE ocupadas.
-            segunda = requests.get(url + "/api/stream", stream=True, timeout=3)
+            segunda = sessao.get(url + "/api/stream", stream=True, timeout=3)
             assert segunda.status_code == 200
-            assert requests.get(url + "/api/stream", timeout=3).status_code == 503
-            assert requests.get(url + "/api/health", timeout=3).ok
+            assert sessao.get(url + "/api/stream", timeout=3).status_code == 503
+            assert sessao.get(url + "/api/health", timeout=3).ok
 
             for m in cadastro:
-                requests.post(url + "/api/add", json={"id": m["id"], "nome": "Teste temporário",
+                sessao.post(url + "/api/add", json={"id": m["id"], "nome": "Teste temporário",
                                                       "lat": lat + 0.002, "lon": lon}, timeout=3).raise_for_status()
             simulacao = subprocess.run(
                 [sys.executable, "scripts/simular_motoboy.py", "--todos", "--url", url,
-                 "--intervalo", "0.1", "--velocidade", "25", "--max-posicoes", "25"],
+                 "--intervalo", "0.1", "--velocidade", "25", "--max-posicoes", "25",
+                 "--usuario", "verificacao", "--senha", "senha-temporaria"],
                 cwd=RAIZ, env={**os.environ, "PYTHONUTF8": "1"}, capture_output=True, timeout=20, **flags,
             )
             assert simulacao.returncode == 0, simulacao.stderr.decode("utf-8", errors="replace")
@@ -119,7 +129,7 @@ def executar():
                 _, dados = fila.get_nowait()
                 quantidade += isinstance(dados, dict)
             assert quantidade >= 5, "Eventos da frota não chegaram continuamente pelo curl -N."
-            trilhas = [requests.get(url + f"/api/tracklog?id={m['id']}", timeout=3).json() for m in cadastro]
+            trilhas = [sessao.get(url + f"/api/tracklog?id={m['id']}", timeout=3).json() for m in cadastro]
             assert all(len(t) >= 20 for t in trilhas), "Algum motoboy não registrou a simulação."
             # Sem mudanças, o comentário chega em 15 s e mantém o túnel vivo.
             prazo = time.monotonic() + 17
