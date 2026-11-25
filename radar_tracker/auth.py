@@ -7,6 +7,7 @@
 - Perfis: "gestor" (gerencia usuários) e "operador".
 """
 
+import ipaddress
 import logging
 import secrets
 import threading
@@ -96,12 +97,28 @@ def _limpar_falhas(ip):
         _tentativas.pop(ip, None)
 
 
+def _proxy_confiavel(ip):
+    """Verdadeiro se o IP está em PROXIES_CONFIAVEIS (IPs ou faixas CIDR separados por vírgula)."""
+    try:
+        endereco = ipaddress.ip_address(ip)
+    except ValueError:
+        return False
+    for item in current_app.extensions["radar"]["config"].PROXIES_CONFIAVEIS.split(","):
+        try:
+            if endereco in ipaddress.ip_network(item.strip(), strict=False):
+                return True
+        except ValueError:
+            continue
+    return False
+
+
 def _ip():
     """IP do cliente para limitar tentativas. Só confia no X-Forwarded-For quando a conexão
-    vem do próprio computador (túnel ou proxy local), que acrescenta o IP real no fim."""
+    vem de um proxy confiável (túnel no próprio PC ou proxy da nuvem), que acrescenta o IP
+    real no fim."""
     ip = request.remote_addr or ""
     encaminhado = request.headers.get("X-Forwarded-For", "")
-    if encaminhado and ip in ("127.0.0.1", "::1"):
+    if encaminhado and _proxy_confiavel(ip):
         return encaminhado.split(",")[-1].strip()
     return ip
 

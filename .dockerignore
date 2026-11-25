@@ -1,0 +1,10 @@
+# Só entra na imagem o necessário para rodar o servidor.
+*
+!radar_tracker/
+!run.py
+!requirements.txt
+!.env
+!config/
+!scripts/criar_usuario.py
+!scripts/backup_banco.py
+**/__pycache__

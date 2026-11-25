@@ -156,6 +156,8 @@ python scripts/simular_motoboy.py --tid 0 --usuario SEU_USUARIO   # use .venv\Sc
 
 Instalação manual, túnel para os celulares (ngrok) e configuração do app OwnTracks estão em **[docs/instalacao.md](docs/instalacao.md)**.
 
+**Na nuvem:** `docker compose up -d --build` sobe o GalviTracks com HTTPS automático (Caddy) e backup diário do banco. Passo a passo na Oracle Cloud, do domínio aos celulares: **[docs/nuvem.md](docs/nuvem.md)**.
+
 ## Usar em outro PC
 
 O repositório já traz tudo o que o sistema precisa: o banco da loja (`data/radar.db`, com os clientes e o histórico), o `.env`, os motoboys (`config/motoboys.json`) e o `tools/ngrok.exe`. Num computador novo com Windows:
@@ -249,6 +251,7 @@ O projeto foi construído em entregas semanais, de agosto a dezembro de 2026, a 
 | Documento | Conteúdo |
 |-----------|----------|
 | [docs/instalacao.md](docs/instalacao.md) | Instalação, ngrok, OwnTracks, simulador, solução de problemas |
+| [docs/nuvem.md](docs/nuvem.md) | Servidor na nuvem (Oracle Cloud): Docker, HTTPS, domínio, backup e celulares |
 | [docs/requisitos.md](docs/requisitos.md) | Atores, requisitos funcionais e não funcionais, regras de negócio |
 | [docs/arquitetura.md](docs/arquitetura.md) | Componentes, camadas, fluxos, algoritmo de rotas, decisões |
 | [docs/api.md](docs/api.md) | Referência de todos os endpoints |
