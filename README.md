@@ -3,7 +3,7 @@
 Rastreamento de motoboys em tempo real, montagem de rotas e histórico de entregas da **Radar Auto Peças** (Jaraguá do Sul/SC). Desenvolvido pela **Galvitech Ltda** só com tecnologias abertas, roda no computador da própria loja e não tem mensalidade.
 
 [![Testes](https://github.com/AndreeSpecht/GalviTracks/actions/workflows/testes.yml/badge.svg)](https://github.com/AndreeSpecht/GalviTracks/actions/workflows/testes.yml)
-![Versão](https://img.shields.io/badge/vers%C3%A3o-0.8.0-blue?style=flat-square)
+![Versão](https://img.shields.io/badge/vers%C3%A3o-0.9.0-blue?style=flat-square)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-000000?style=flat-square&logo=flask&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white)

@@ -16,7 +16,7 @@ Entregas **toda sexta-feira** do 8º período, semestre final (2026/2), de 07/08
 |-------|------|-----------|--------|
 | M1 | 28/08/2026 | Requisitos e projeto aprovados | ✅ Concluído |
 | M2 | 25/09/2026 | v0.8.0: sistema funcional, testado e documentado | ✅ Concluído |
-| M3 | 30/10/2026 | v0.9.0: rastreador homologado na Radar Auto Peças (replanejado para a semana 14) | 🔄 Em andamento |
+| M3 | 25/11/2026 | v0.9.0 publicada; homologação com o operador da loja pendente | 🔄 Em andamento |
 | M4 | 20/11/2026 | Demonstração com celular real pelo túnel concluída | 🔜 Planejado |
 | M5 | 04/12/2026 | v1.0.0 e portfólio prontos para a apresentação | 🔜 Planejado |
 

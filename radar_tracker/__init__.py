@@ -10,7 +10,7 @@ from .db import Banco
 from .frota import Frota
 from .stream import Streams
 
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 
 
 def create_app(config=None, motoboys=None):
