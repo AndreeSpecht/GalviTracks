@@ -108,7 +108,7 @@ Dê uma volta no quarteirão e confira o motoboy no mapa.
   cd GalviTracks && git pull && docker compose up -d --build
   ```
 
-  A rota em andamento e o banco ficam em `data/` e sobrevivem à atualização.
+  A rota em andamento e o banco ficam em `data/` e sobrevivem à atualização. **Atenção:** se a pasta da VM foi clonada antes de o `data/radar.db` sair do Git (26/11/2026), rode uma vez `git rm --cached data/radar.db` na VM antes do `git pull`, para o Git não apagar o banco oficial.
 - **Ver os logs:** `docker compose logs -f app`
 - **Backups:** `data/backup/radar_AAAA-MM-DD.db` na VM. Para guardar uma cópia fora da nuvem: `scp ubuntu@IP_DA_VM:~/GalviTracks/data/backup/radar_*.db .`
 - **Restaurar um backup:** `docker compose stop app`, copie o arquivo do backup por cima de `data/radar.db` (e apague `data/radar.db-wal` e `data/radar.db-shm`), `docker compose start app`.
