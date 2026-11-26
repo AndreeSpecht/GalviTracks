@@ -29,7 +29,7 @@ No [registro.br](https://registro.br) (precisa de CPF ou CNPJ), compre o domíni
 
 1. Crie a conta em [oracle.com/cloud/free](https://www.oracle.com/cloud/free/). Escolha a **região São Paulo** (*Brazil East*): ela não pode ser trocada depois. O cartão é pedido só para verificação; os recursos *Always Free* não são cobrados.
 2. Menu **Compute → Instances → Create instance**:
-   - **Image:** Canonical Ubuntu 24.04.
+   - **Image:** Canonical Ubuntu 24.04 ou Oracle Linux 9 (o `preparar_vm.sh` funciona nos dois; no Oracle Linux o usuário do SSH é `opc` em vez de `ubuntu`). Escolha o shape antes da imagem: a lista só mostra imagens compatíveis.
    - **Shape:** *Ampere* `VM.Standard.A1.Flex` com 2 OCPUs e 12 GB (grátis). Se aparecer *out of capacity*, tente outro *Availability Domain* ou use a `VM.Standard.E2.1.Micro` (AMD, 1 GB, também grátis: dá conta do GalviTracks com o swap do passo 5).
    - **Networking:** deixe criar a VCN nova, com IP público.
    - **SSH keys:** *Paste public keys* e cole a chave pública (a do seu PC ou a que o Claude gerou para fazer a implantação).
