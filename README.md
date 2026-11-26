@@ -1,6 +1,6 @@
 # GalviTracks
 
-Rastreamento de motoboys em tempo real, montagem de rotas e histórico de entregas da **Radar Auto Peças** (Jaraguá do Sul/SC). Desenvolvido pela **Galvitech Ltda** só com tecnologias abertas, roda no computador da própria loja e não tem mensalidade.
+Rastreamento de motoboys em tempo real, montagem de rotas e histórico de entregas da **Radar Auto Peças** (Jaraguá do Sul/SC). Desenvolvido pela **Galvitech Ltda** só com tecnologias abertas, roda num servidor próprio (na nuvem, em [galvitracks.com.br](https://galvitracks.com.br), ou no computador da loja) e não depende de plataforma paga de terceiros.
 
 [![Testes](https://github.com/AndreeSpecht/GalviTracks/actions/workflows/testes.yml/badge.svg)](https://github.com/AndreeSpecht/GalviTracks/actions/workflows/testes.yml)
 ![Versão](https://img.shields.io/badge/vers%C3%A3o-0.9.0-blue?style=flat-square)
@@ -28,6 +28,7 @@ Rastreamento de motoboys em tempo real, montagem de rotas e histórico de entreg
 - [Arquitetura](#arquitetura)
 - [Tecnologias](#tecnologias)
 - [Início rápido](#início-rápido)
+- [Em produção](#em-produção)
 - [Usar em outro PC](#usar-em-outro-pc)
 - [Estrutura do repositório](#estrutura-do-repositório)
 - [Configuração](#configuração)
@@ -102,7 +103,7 @@ flowchart LR
     OSRM["OSRM + OpenStreetMap<br/>(rotas)"]
     WEB["🖥️ Painel web (Leaflet.js)<br/>operador da loja"]
 
-    APP -- "posição GPS (HTTP, túnel ngrok)" --> API
+    APP -- "posição GPS (HTTPS)" --> API
     WEB <-->|"REST + SSE (/api/stream)"| API
     API --> FROTA
     API --> DB
@@ -122,7 +123,8 @@ Detalhes, diagramas de estado e sequência e as decisões de projeto estão em [
 | Geocodificação | **Nominatim** | Busca de endereços |
 | Painel | **Leaflet.js · JavaScript (módulos ES) · CSS** | Mapa interativo e interface, sem framework |
 | Relatórios | **openpyxl** | Exportação do histórico em Excel |
-| Acesso dos celulares | **ngrok** | Túnel HTTPS até o servidor da loja |
+| Hospedagem | **Docker · Caddy · Oracle Cloud** | Servidor na nuvem com HTTPS automático e backup diário |
+| Acesso dos celulares (servidor local) | **ngrok** | Túnel HTTPS até um servidor no PC da loja |
 | Instalador | **C# (.NET Framework)** | `GalviTracks.exe` |
 | Qualidade | **pytest · GitHub Actions** | 152 testes em Windows e Ubuntu |
 
@@ -158,9 +160,20 @@ Instalação manual, túnel para os celulares (ngrok) e configuração do app Ow
 
 **Na nuvem:** `docker compose up -d --build` sobe o GalviTracks com HTTPS automático (Caddy) e backup diário do banco. Passo a passo na Oracle Cloud, do domínio aos celulares: **[docs/nuvem.md](docs/nuvem.md)**.
 
+## Em produção
+
+O sistema da loja roda na nuvem (Oracle Cloud) em **https://galvitracks.com.br**, com HTTPS, login e backup diário do banco. Os celulares enviam a posição direto para lá, e o painel abre de qualquer computador ou celular com usuário e senha. Implantação, atualização e backups: **[docs/nuvem.md](docs/nuvem.md)**.
+
+O banco da loja (`data/radar.db`) fica só no servidor e **não vai para o GitHub**: tem clientes reais e as senhas (com hash) dos usuários, e o repositório é público. Para trazer uma cópia do banco da nuvem para o PC, baixe um dos backups diários (são guardados 14 dias):
+
+```bash
+ssh -i CHAVE opc@IP_DA_VM "ls ~/GalviTracks/data/backup"
+scp -i CHAVE opc@IP_DA_VM:GalviTracks/data/backup/radar_AAAA-MM-DD.db data/radar.db
+```
+
 ## Usar em outro PC
 
-O repositório já traz tudo o que o sistema precisa: o banco da loja (`data/radar.db`, com os clientes e o histórico), o `.env`, os motoboys (`config/motoboys.json`) e o `tools/ngrok.exe`. Num computador novo com Windows:
+Para rodar o sistema num computador (desenvolvimento, demonstração ou volta ao servidor local). Um clone novo começa com o banco vazio: a tela de **primeiro acesso** cria o gestor, e para usar os dados da loja copie o banco da nuvem (seção acima). Num computador com Windows:
 
 **1. Instale uma vez**
 - [Python 3.10 ou mais novo](https://www.python.org/downloads/): na instalação, marque **Add python.exe to PATH**.
@@ -172,7 +185,7 @@ O repositório já traz tudo o que o sistema precisa: o banco da loja (`data/rad
 git clone https://github.com/AndreeSpecht/GalviTracks.git
 ```
 
-**3. Abra.** Dê dois cliques em `GalviTracks\GalviTracks.exe`. Na primeira vez ele instala o ambiente Python (alguns minutos); depois sobe o servidor e abre o painel com os clientes da loja.
+**3. Abra.** Dê dois cliques em `GalviTracks\GalviTracks.exe`. Na primeira vez ele instala o ambiente Python (alguns minutos); depois sobe o servidor e abre o painel.
 
 **4. Responda às duas perguntas da primeira vez.** Na primeira execução em cada PC, a janela do GalviTracks pede duas senhas, que ficam só nesse computador e **não** vão para o GitHub:
 
@@ -181,19 +194,7 @@ git clone https://github.com/AndreeSpecht/GalviTracks.git
 
 As senhas aparecem como `*` enquanto você digita. Se apertar Enter sem digitar, o GalviTracks abre só o painel, sem o túnel: as posições dos celulares não chegam, e ele pergunta de novo na próxima vez. Para trocar a senha dos celulares depois, edite ou apague o `.env.local`; para trocar o authtoken, rode `tools\ngrok.exe config add-authtoken NOVO_TOKEN`.
 
-**Mantendo os dados iguais entre os PCs.** O banco não sincroniza sozinho: ele vai para o GitHub como um arquivo.
-
-- **Antes de usar**, pegue a versão mais recente: na pasta `GalviTracks`, rode `git pull`.
-- **Depois de usar**, feche a janela do GalviTracks (assim tudo é gravado no banco) e envie:
-
-  ```bat
-  git add data/radar.db
-  git commit -m "chore: atualiza o banco da loja"
-  git push
-  ```
-
-  No primeiro `git push` o Windows pede para entrar na conta do GitHub. Se o Git pedir nome e e-mail, configure uma vez com `git config --global user.name "Seu Nome"` e `git config --global user.email "seu@email"`.
-- **Use o sistema em um PC por vez.** Se dois PCs alterarem o banco ao mesmo tempo, o Git não consegue juntar os dois e uma das versões precisa ser descartada.
+Para atualizar o código depois, rode `git pull` na pasta `GalviTracks`. O banco local não é afetado: ele não vai para o GitHub.
 
 ## Estrutura do repositório
 
@@ -231,7 +232,7 @@ GalviTracks/
 
 Todas as opções ficam no arquivo `.env` (modelo em [`.env.example`](.env.example)): nome e coordenadas da loja, cidade de busca, servidor OSRM, fator de atraso, token do OwnTracks, limites do filtro de GPS e opções do login (`SECRET_KEY`, `SESSAO_DIAS`, `COOKIE_SEGURO`, `ACESSO_PAINEL_INTERNET`). Senhas ficam no `.env.local`, que não vai para o Git. Os motoboys ficam em `config/motoboys.json` (nome, cor e Tracker ID do OwnTracks).
 
-O banco (`data/radar.db`), o `.env`, o `config/motoboys.json` e o `tools/ngrok.exe` **são versionados**, para que um clone em qualquer PC já abra com os dados da loja.
+O `.env`, o `config/motoboys.json` e o `tools/ngrok.exe` são versionados. O banco (`data/radar.db`) **não**: o oficial fica no servidor da nuvem (veja [Em produção](#em-produção)).
 
 ## Testes
 

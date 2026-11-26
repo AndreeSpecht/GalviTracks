@@ -39,7 +39,7 @@ Rotas: OSRM público (fallback offline por Haversine) · Endereços: Nominatim �
 | `scripts/windows/tunel_ngrok.bat` | abre só o túnel |
 | `scripts/docs/` | gerador do cronograma: `dados.js` (fonte) + `gerar.js` → `.docx` e `.md` |
 | `scripts/docs/cena_demo.py`, `capturas_readme.py` | regeneram as imagens do README em `docs/img/` (cena isolada na porta 5098 com cópia do banco + Playwright com o Edge; Playwright e Pillow ficam num venv à parte) |
-| `tests/` | pytest (152 testes) |
+| `tests/` | pytest (157 testes) |
 
 Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dados, desenvolvimento, cronograma) e `CHANGELOG.md`.
 
@@ -65,16 +65,15 @@ Documentação: `docs/` (instalacao, requisitos, arquitetura, api, banco-de-dado
 - **Importante:** o waitress apaga cabeçalhos de proxy por padrão. `criar_servidor()` usa `clear_untrusted_proxy_headers=False`; sem isso o bloqueio não funciona em produção. O teste `test_waitress_repassa_cabecalho_do_tunel` protege isso.
 - Validado em 06/11 com túnel ngrok real (domínio da conta: `unhasty-leighton-grouty.ngrok-free.dev`).
 - **Login de operador** (`radar_tracker/auth.py`, 25/11/2026): todas as rotas exigem sessão, exceto login, primeiro acesso, `/api/health`, OwnTracks e `/static/`. Ordem dos `before_app_request`: primeiro o bloqueio externo (`api.py`), depois o login (`auth.py`), definida pela ordem de registro dos blueprints em `create_app`. `ACESSO_PAINEL_INTERNET=1` (nuvem) libera o painel pela internet com login. Nos testes, o fixture `client` já vem logado como gestor e `anonimo` vem sem login; o hash de teste usa pbkdf2 barato.
-- **Atenção:** os usuários (com hash scrypt das senhas) ficam no `data/radar.db`, que é versionado no repositório público. Hash scrypt não revela a senha, mas senhas fracas podem ser quebradas offline; oriente senhas fortes ou, ao ir para a nuvem, pare de versionar o banco.
+- Os usuários (com hash scrypt das senhas) ficam no `data/radar.db`. Desde 26/11/2026 o banco **não é mais versionado** (o oficial está na nuvem); versões antigas continuam no histórico do git.
 
 ## Dados e configuração no repositório
 
-- **Decisão do André (11/11/2026):** o repositório é **público** e mesmo assim versiona `data/radar.db` (clientes reais da loja, com endereço e telefone), `.env`, `config/motoboys.json` e `tools/ngrok.exe`, para que um clone em qualquer PC funcione com os dados. Ele foi avisado de que os dados ficam públicos.
+- O repositório é **público** e versiona `.env`, `config/motoboys.json` e `tools/ngrok.exe`. O `data/radar.db` foi versionado de 11/11 a 26/11/2026 (decisão do André); no corte para a nuvem saiu do git (`git rm --cached`, `.gitignore`), e o banco oficial é o da VM (`~/GalviTracks/data/radar.db`, backups diários em `data/backup/`).
 - `_legado_local/oficinas.db` (banco do sistema antigo, mesmas 83 oficinas do `radar.db`) também é versionado, como cópia de segurança, a pedido do André (25/11/2026).
 - Continuam fora do git: `data/*.db-wal`, `data/*.db-shm`, `data/ngrok.log`, `data/sessao.json`, `tools/cloudflared.exe` (68 MB, não usado pelo launcher), `Entrega_Professora/`, o resto de `_legado_local/`, `.venv/`, `scripts/docs/node_modules/`.
 - **Nunca commitar segredos** no `.env`: nem o authtoken do ngrok (daria a qualquer um o domínio da loja e as posições dos motoboys) nem o `OWNTRACKS_TOKEN` real. O authtoken do ngrok fica no `ngrok.yml` de cada PC (`tools\ngrok.exe config add-authtoken ...`). O `OWNTRACKS_TOKEN` fica no `.env.local` (fora do git, prioridade sobre o `.env`; `config.carregar_arquivos_env()`), criado pelo exe na primeira execução de cada PC.
-- Passo a passo para clonar em outro PC e sincronizar o banco: seção "Usar em outro PC" do README.
-- Para commitar o banco, o GalviTracks deve estar fechado (ou fazer antes `PRAGMA wal_checkpoint(FULL)`), senão alterações recentes ficam só no `-wal`.
+- Clonar em outro PC: seção "Usar em outro PC" do README; copiar o banco da nuvem: seção "Em produção".
 - **Nunca use `data/radar.db` em testes ou experimentos.** Para subir um servidor de teste isolado:
   ```bash
   PASTA_DADOS=<pasta temporária> DB_PATH=<pasta>/t.db ARQUIVO_SESSAO=<pasta>/s.json \
@@ -118,7 +117,7 @@ cd scripts/docs && npm install && npm run gerar   # regenera docs/Cronograma_Ent
 
 ## Pendências e próximos passos (por prioridade)
 
-1. **Servidor na nuvem** (decisão de 25/11/2026: **Oracle Cloud Always Free**, **domínio novo comprado no registro.br**, **a nuvem vira o banco oficial**). Pronto e testado localmente em Docker (`Dockerfile`, `compose.yml` com app + Caddy + backup, `deploy/`, passo a passo em `docs/nuvem.md`). Falta o André criar a conta/VM na Oracle (região São Paulo, Ubuntu 24.04, A1.Flex) e comprar o domínio; com o IP e a chave SSH, a implantação é: `deploy/preparar_vm.sh`, `.env.nuvem`, `scp` do `data/radar.db`, `docker compose up -d --build`, OwnTracks dos celulares apontando para `https://DOMINIO/api/gps/owntracks`. **No corte para a nuvem:** parar de versionar o `data/radar.db` (`git rm --cached`, `.gitignore`) e ajustar a seção "Usar em outro PC" do README.
+1. **Servidor na nuvem: no ar desde 26/11/2026** em https://galvitracks.com.br. VM Oracle Cloud `VM.Standard.A1.Flex` (1 OCPU, 6 GB, Oracle Linux 9, usuário `opc`, IP 146.235.57.243), conta Pay As You Go com o CNPJ da Galvitech; chave SSH em `~/.ssh/galvitracks_oracle`. A pasta `~/GalviTracks` na VM **não é um clone git** (arquivos copiados); para atualizar, copie os arquivos alterados e rode `docker compose up -d --build` (ou `caddy reload` para o Caddyfile). DNS no registro.br (zona do próprio registro.br, registros A para `@` e `www`; o Caddy só atende o domínio sem `www`). O André pretende manter a VM cerca de um mês: antes de desligar, trazer o banco para o PC. Pendente: confirmar que a instância paga E3.Flex criada por engano foi encerrada.
 2. **Primeiro uso real do túnel**: o André abre o `GalviTracks.exe`, digita a senha dos celulares (vai para o `.env.local`), coloca a mesma senha no OwnTracks dos motoboys e testa um motoboy real com dados móveis. As perguntas da primeira execução foram testadas em 11/11 numa cópia do projeto (senha, authtoken com o `ngrok.yml` removido e restaurado, e Enter para pular).
 3. **Homologação na loja**: a release **v0.9.0** foi publicada em 25/11/2026 sem a homologação formal; quando o operador conferir o sistema, marcar o M3 e a semana 14 como concluídos em `scripts/docs/dados.js`. Na **v1.0.0** (#59, 04/12): subir `__version__`, `pyproject.toml`, o User-Agent do Nominatim (`roteamento.py`) e o selo do README, mover o `[Não lançado]` do CHANGELOG e publicar com `gh release create`.
 4. Demonstração com **um celular real** pelo túnel (semana 15), ajustes (16), material do portfólio: capturas e vídeo (17), **v1.0.0** e apresentação (18, 04/12).

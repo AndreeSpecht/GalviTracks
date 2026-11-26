@@ -9,8 +9,9 @@ htmlcov/
 venv/
 env/
 
-# O .env, o config/motoboys.json, o banco data/radar.db e o tools/ngrok.exe SÃO versionados,
-# para que um clone em qualquer PC já funcione com os dados da loja.
+# O .env, o config/motoboys.json e o tools/ngrok.exe SÃO versionados,
+# para que um clone em qualquer PC já funcione. O banco (data/radar.db) NÃO: o oficial fica
+# no servidor da nuvem (docs/nuvem.md) e tem clientes reais e senhas (com hash).
 # Nunca coloque no .env o authtoken do ngrok nem outras senhas: o repositório é público.
 # Senhas deste PC ficam no .env.local (criado pelo GalviTracks.exe na primeira vez).
 .env.local
@@ -18,7 +19,6 @@ env/
 
 # Arquivos temporários do banco e da execução
 data/*
-!data/radar.db
 *.db-wal
 *.db-shm
 *.sqlite3
