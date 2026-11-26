@@ -17,7 +17,8 @@
 	header {
 		Strict-Transport-Security "max-age=31536000"
 		X-Content-Type-Options "nosniff"
-		Referrer-Policy "same-origin"
+		# O OpenStreetMap bloqueia (403) pedidos de tiles sem Referer; este valor envia só a origem.
+		Referrer-Policy "strict-origin-when-cross-origin"
 		-Server
 	}
 }
