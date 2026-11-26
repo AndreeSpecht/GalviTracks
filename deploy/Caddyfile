@@ -1,10 +1,6 @@
 # Proxy reverso com HTTPS automático (Let's Encrypt) para o domínio do .env.nuvem.
 # O Caddy acrescenta o X-Forwarded-For com o IP real do cliente; o GalviTracks confia
 # nele porque a conexão vem da rede interna do Docker (PROXIES_CONFIAVEIS).
-{
-	email {$EMAIL_CERTIFICADO}
-}
-
 {$DOMINIO} {
 	# Tempo real (SSE): repassa cada evento na hora, sem compressão nem buffer
 	handle /api/stream {
