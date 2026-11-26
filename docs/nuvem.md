@@ -65,7 +65,7 @@ Entre de novo (`ssh ubuntu@IP_DA_VM`), depois:
 ```bash
 cd GalviTracks
 cp deploy/env.nuvem.example .env.nuvem
-nano .env.nuvem                      # DOMINIO, EMAIL_CERTIFICADO, OWNTRACKS_TOKEN e SECRET_KEY
+nano .env.nuvem                      # DOMINIO, OWNTRACKS_TOKEN e SECRET_KEY
 ```
 
 Leve o banco da loja (clientes, histórico e usuários). No PC da loja, **com o GalviTracks fechado**:
